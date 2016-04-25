@@ -22,17 +22,11 @@ class User < ActiveRecord::Base
   end
 
   def get_role
-    if self.has_role?(:admin)
-      role = 'admin'
-    elsif self.has_role?(:user)
-      role = 'user'
-    elsif self.has_role?(:sales)
-      role = 'sales'
-    elsif self.has_role?(:support)
-      role = 'support'
+    user_role = self.roles.first
+    if user_role.present?
+      role = user_role.name
     else
       role = nil
     end
-  end
-  
+  end  
 end

@@ -76,6 +76,7 @@ Rails.application.routes.draw do
       end
       resources :vendors
       resources :settings
+      resources :roles
       get "equipment/delete/:id" => "equipment#delete"
       get "items/delete/:id" => "items#delete"
       get "/" => "home#show"

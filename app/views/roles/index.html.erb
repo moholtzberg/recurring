@@ -1,0 +1,33 @@
+<% content_for :app_location do %>Roles/Index<% end %>
+<div id="roles" class="col-md-12">
+	
+	<table class="table table-bordered table-condensed">
+		
+		<tr>
+			<th width="2%">ID</th>
+			<th>Role Name</th>
+			<th width="30%">Created at</th>
+			<th width="2%"></th>
+		</tr>
+		
+		<% @roles.each do |role| %>
+		<tr id="order_<%= role.id %>">
+			<%= render :partial => "roles/role", :locals => {:role => role}%>
+		<tr>
+		<% end %>
+
+	</table>
+	<%= link_to new_role_path, :class => "btn btn-default pull-right", :remote => true do %><span class="glyphicon glyphicon-plus"></span><% end %>
+
+</div>
+
+<div id="myModal" class="modal fade" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			
+		</div>
+	</div>
+</div>
+
+
+
