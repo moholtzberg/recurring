@@ -53,6 +53,7 @@ module ApplicationHelper
   end
   
   def all_roles
-    roles = [['Admin','admin'], ['Sales', 'sales'], ['Support', 'support'], ['User', 'user']]
+    roles = Role.all
+    roles.map{|r| r.name}
   end
 end

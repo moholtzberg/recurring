@@ -18,6 +18,15 @@
 #  {category_id: 1, number: "UNV21200", name: "Universal® White Copy Paper, (8.5 x 11, 20 lbs, 92 Bright, 5000/Carton)", slug: "universal-white-copy-paper", price: 44.99, sale_price: 39.99, cost_price: 37.95},
 #])
 
+
+ActiveRecord::Base.connection.execute("TRUNCATE roles")
+ActiveRecord::Base.connection.reset_pk_sequence!('roles')
+roles = ['admin', 'user', 'support', 'sales']
+roles.each do |index|
+    role = Role.new(:name => index)
+    role.save!
+end
+
 user1 = User.find_by_email('admin@247officesupply.com')
 user1.add_role(:admin)
 

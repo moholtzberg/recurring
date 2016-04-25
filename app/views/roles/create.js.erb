@@ -1,0 +1,6 @@
+<% unless flash[:error] %>
+	$('#myModal').modal("hide")
+	$('body').removeClass('modal-open')
+	$('.modal-backdrop').remove()
+	$("#roles").html("<%= j render :template => 'roles/index.html', :format => 'html' %>")
+<% end %>
