@@ -2,6 +2,9 @@ class ItemImport
   # switch to ActiveModel::Model in Rails 4
   include ActiveModel::Model
   attr_accessor :file
+  attr_accessor :file_path
+  attr_accessor :import_hisotry
+
 
   def initialize(attributes = {})
     attributes.each { |name, value| send("#{name}=", value) }
@@ -16,17 +19,22 @@ class ItemImport
     imported_products.each do |imp|
       if !imp.nil?
         if imp.valid?
+          import_hisotry.update(nb_imported: import_hisotry.nb_imported + 1)
           imp.save!
         else
-          imported_products.each_with_index do |product, index|
-            product.errors.full_messages.each do |message|
-              errors.add :base, "Row #{index+2}: #{message}"
-            end
-          end
-          false
+          # imported_products.each_with_index do |product, index|
+          #   product.errors.full_messages.each do |message|
+          #     errors.add :base, "Row #{index+2}: #{message}"
+          #   end
+          # end
+          # false
+          import_hisotry.update(nb_failed: import_hisotry.nb_failed + 1)
         end
         true
+      else
+        import_hisotry.update(nb_failed: import_hisotry.nb_failed + 1)
       end
+      import_hisotry.update(nb_in_queue: import_hisotry.nb_in_queue - 1)
     end
   end
 
@@ -35,8 +43,10 @@ class ItemImport
   end
 
   def load_imported_products
-    spreadsheet = CSV.read(file.path, :headers => true, :encoding => 'ISO-8859-1')
+
+    spreadsheet = CSV.read(file_path || file.path, :headers => true, :encoding => 'ISO-8859-1')
     # header = spreadsheet[0]
+    import_hisotry.update(nb_in_queue: spreadsheet.size)
     spreadsheet.map do |row|
       if row["price"].to_f > 0 and row["cost_price"].to_f > 0
         unless Item.find_by(:number => row["number"])
@@ -48,7 +58,7 @@ class ItemImport
           item.attributes = row.to_hash.slice(*Item.attribute_names())
           item.id = id
         end
-        puts "----> #{item.inspect}"
+        # puts "----> #{item.inspect}"
         item
       end
     end
