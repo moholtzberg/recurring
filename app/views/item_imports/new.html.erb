@@ -1,7 +1,25 @@
 <% content_for :app_location do %>Items Import/New<% end %>
-<div id="items" class="col-md-12">
+<div id="items" class="col-md-offset-1 col-md-10">
 	
 	<h1>Item Import</h1>
+
+	<% if alert %>
+		<br>
+		<div class="alert alert-danger alert-dismissible" role="alert">
+			<strong>Error!: </strong> <%=alert%>
+		</div>
+		<br>
+	<% end %>
+
+	<% if notice %>
+		<br>
+		<div class="alert alert-success alert-dismissible" role="alert">
+			<strong>Succuss!: </strong> <%=notice%>.
+			Rows imported:<b><span class="js-imported">0</span></b>,
+			Rows failed:<b><span class="js-fail">0</span></b>,
+			Rows in queue:<b><span class="js-queue">0</span></b>.
+		</div>
+	<% end %>
 	
 	<p>A CSV or Excel file can be used to import records. The first row should be the column name. The following columns are allowed.</p>
 
@@ -38,8 +56,33 @@
 		<div class="field">
 		<%= f.file_field :file %>
 		</div>
-		<div class="buttons"><%= f.submit "Import" %></div>
+		<br>
+		<button type="submit" class="btn btn-primary">Import</button>
+
 		
 	<% end %>
+<br>
+<br>
 	
 </div>
+
+<script>
+	
+	var timer;
+	function check_for_import(){
+		$(document).ready(function() {
+		  $.ajax({
+		    url: "/admin/check_for_import",
+		    type: "GET"
+		  }).done(function(response) {
+		  	$(".js-imported").text(response.nb_imported);
+		  	$(".js-fail").text(response.nb_failed);
+		  	$(".js-queue").text(response.nb_in_queue);
+		  });
+		});
+		
+	}
+
+	timer=setInterval("check_for_import()", 1000);
+
+</script>
