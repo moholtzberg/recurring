@@ -1,10 +1,33 @@
 class ItemImport
   # switch to ActiveModel::Model in Rails 4
   include ActiveModel::Model
-  attr_accessor :file
-  attr_accessor :file_path
-  attr_accessor :import_hisotry
+  # attr_accessor :file
+  # attr_accessor :file_path
+  # attr_accessor :import_hisotry
 
+  def put_file(file)
+    @file = file
+  end
+
+  def file
+    @file
+  end
+
+  def put_file_path(file_path)
+    @file_path = file_path
+  end
+
+  def put_import_hisotry(import_hisotry)
+    @import_hisotry = import_hisotry
+  end
+
+  def file_path
+    @file_path
+  end
+
+  def import_hisotry
+    @import_hisotry
+  end
 
   def initialize(attributes = {})
     attributes.each { |name, value| send("#{name}=", value) }
