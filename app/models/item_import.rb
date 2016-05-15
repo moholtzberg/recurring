@@ -39,8 +39,11 @@ class ItemImport
 
   def save
     puts "---->>>>> #{imported_products.inspect}"
+    i = 0
     imported_products.each do |imp|
+      i = i + 1
       if !imp.nil?
+        #Check if the object is valid
         if imp.valid?
           import_hisotry.update(nb_imported: import_hisotry.nb_imported + 1)
           imp.save!
@@ -51,14 +54,19 @@ class ItemImport
           #   end
           # end
           # false
+          #Increment the number of faild raws
           import_hisotry.update(nb_failed: import_hisotry.nb_failed + 1)
+          import_hisotry.update(failed_lines: import_hisotry.failed_lines + i.to_s + ", " )
         end
         true
       else
         import_hisotry.update(nb_failed: import_hisotry.nb_failed + 1)
+        import_hisotry.update(failed_lines: import_hisotry.failed_lines + i.to_s + ", " )
       end
       import_hisotry.update(nb_in_queue: import_hisotry.nb_in_queue - 1)
     end
+    #Update the import_history object when th processing is complete
+    import_hisotry.update(is_processing: 0)
   end
 
   def imported_products
