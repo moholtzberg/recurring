@@ -91,21 +91,21 @@
 								<% cat.children.limit(cat.children.count/3).each do |child| %>
 								<li class="col-sm-4">
 									<ul>
-										<li><%= link_to child.name, "/#{child.slug}"%></li>
+										<li><%= link_to child.name, "/search?keywords=#{child.name}"%></li>
 									</ul>
 								</li>
 								<% end %>
 								<% cat.children.limit(cat.children.count/3).offset(cat.children.count/3).each do |child| %>
 								<li class="col-sm-4">
 									<ul>
-										<li><%= link_to child.name, "/#{child.slug}"%></li>
+										<li><%= link_to child.name, "/search?keywords=#{child.name}"%></li>
 									</ul>
 								</li>
 								<% end %>
 								<% cat.children.limit(cat.children.count/3).offset((cat.children.count/3)*2).each do |child| %>
 								<li class="col-sm-4">
 									<ul>
-										<li><%= link_to child.name, "/#{child.slug}"%></li>
+										<li><%= link_to child.name, "/search?keywords=#{child.name}"%></li>
 									</ul>
 								</li>
 								<% end %>
