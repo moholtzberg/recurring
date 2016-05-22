@@ -1,5 +1,25 @@
 class Item < ActiveRecord::Base
   
+  searchable do
+    text :description, :stored => true
+    text :number, :stored => true
+    text :name, :stored => true
+    text :slug, :stored => true
+    text :category do
+      category.name if category
+    end
+    text :brand do
+      brand.name if brand
+    end
+    text :item_properties do
+      item_properties.map { |item_propertie| item_propertie.key }
+    end
+
+    text :item_properties do
+      item_properties.map { |item_propertie| item_propertie.value }
+    end
+  end
+
   scope :active, -> { where(:active => true)}
   
   has_many :account_item_prices, :dependent => :destroy, :inverse_of => :item
@@ -59,22 +79,35 @@ class Item < ActiveRecord::Base
     #   ransack(:number_or_name_or_description_or_categories_name_cont_all => word.split).result
     # else
     #   ransack(:number_or_name_or_description_or_categories_name_cont_all => word.split).result
-    # end
-    
+    # end  
   end
   
-  def self.search(word)
-    includes(:brand, :categories).where("lower(number) like ? or lower(items.name) like ? or lower(items.description) like ? or lower(brands.name) like ? or lower(categories.name) like ?", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%").references(:brand, :categories)
-    # word = word.downcase.gsub(/[^a-z 0-9]/, " ")
-    # if ransack(:number_cont_all => word.split).result.count > 1
-    #   ransack(:number_cont_all => word.split).result
-    # elsif ransack(:number_or_name_cont_all => word.split).result.count > 1
-    #   ransack(:number_or_name_cont_all => word.split, :name_cont_all => word.split).result
-    # elsif ransack(:number_or_name_or_description_cont_all => word.split).result.count > 1
-    #   ransack(:number_or_name_or_description_cont_all => word.split).result
-    # else
-    #   ransack(:number_or_name_or_description_or_categories_name_cont_all => word.split).result
-    # end
+  
+  def self.search_fulltext(word, page)
+    # includes(:brand, :categories).where("lower(number) like ? or lower(items.name) like ? or lower(items.description) like ? or lower(brands.name) like ? or lower(categories.name) like ?", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%", "%#{word.downcase}%").references(:brand, :categories)
+    # Item.search { fulltext word }.result
+    res = Sunspot.search( Item ) do
+       fulltext word
+       paginate :page => page, :per_page => 10
+    end
+    res.results
+  end
+
+  def self.render_auto(word)
+    res = Sunspot.search( Item ) do
+       fulltext word
+    end
+    
+    occurence = []
+    res.results.each do |item|
+      occurence << item.name if item.name.include?(word)
+      occurence << item.description if item.description.include?(word)
+      occurence << item.number if item.number.include?(word)
+      occurence << item.slug if item.slug.include?(word)
+      occurence << item.category.name if item.category and item.category.name.include?(word)
+      occurence << item.brand.name if item.brand and item.brand.name.include?(word)
+    end
+    occurence.uniq
   end
   
   self.per_page = 10

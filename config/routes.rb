@@ -83,6 +83,10 @@ Rails.application.routes.draw do
       get "equipment/delete/:id" => "equipment#delete"
       get "items/delete/:id" => "items#delete"
       get "/" => "home#show"
+      
+      get "/check_for_import" => "item_imports#check_for_import"
+
+
     end
   end
   
@@ -114,6 +118,8 @@ Rails.application.routes.draw do
   
   get "/cart" => "shop#cart"
   get "/search" => "shop#search"
+  get "/search_autocomplete" => "shop#search_autocomplete"
+  
   get "/categories/:parent_id" => "shop#categories"
   get "/:category/:item" => "shop#item"
   get "/:category" => "shop#category"
