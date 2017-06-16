@@ -41,6 +41,7 @@ SUMMARY
 Subtotal     - <%= number_to_currency(@order.sub_total) %>
 Sales Tax    - <%= number_to_currency(@order.tax_total) %>
 Shipping     - <%= number_to_currency(@order.shipping_total) %>
+Discount     - <%= number_to_currency(- @order.discount_total) %>
 Total        - <%= number_to_currency(@order.total) %>
 Payments     - <%= number_to_currency(@order.payments_total) %>
 Balance Due  - <%= number_to_currency(@order.balance_due) %>
