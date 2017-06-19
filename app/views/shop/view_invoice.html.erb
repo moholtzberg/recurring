@@ -98,6 +98,10 @@
 		<td colspan="2" class="text-center"><strong> <%= number_to_currency(@invoice.shipping_total) %></strong></td>
 	</tr>
 	<tr>
+		<td colspan="3">Discount</td>
+		<td colspan="2" class="text-center"><strong> <%= number_to_currency(- @invoice.discount_total) %></strong></td>
+	</tr>
+	<tr>
 		<td colspan="3">Invoice Total</td>
 		<td colspan="2" class="text-center"><strong> <%= number_to_currency(@invoice.total) %></strong></td>
 	</tr>
