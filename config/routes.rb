@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       resources :account_item_prices
       resources :account_item_price_imports
       resources :assets
+      resources :bins
       resources :brands
       resources :brand_imports
       resources :categories
@@ -58,7 +59,9 @@ Rails.application.routes.draw do
         end
       end
       resources :group_item_prices
-      resources :inventories
+      resources :inventories do
+        resources :transfers, only: [:new, :create]
+      end
       resources :invoices
       resources :items do
         collection do
@@ -112,7 +115,7 @@ Rails.application.routes.draw do
           put :resend_invoice
           put :resend_order
         end
-        resources :purchase_order_receipts, :only => [:new, :create]
+        resources :purchase_order_receipts, :only => [:new, :create, :destroy]
       end
       resources :purchase_order_line_items
       resource :reports, :only => :index do
@@ -136,6 +139,7 @@ Rails.application.routes.draw do
         get :reset_password
       end
       resources :vendors
+      resources :warehouses
       get "items/delete/:id" => "items#delete"
       get "/" => "home#show"
       get "/check_for_import" => "item_imports#check_for_import"
