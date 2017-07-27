@@ -45,6 +45,7 @@ class BinsController < ApplicationController
   def create
     authorize! :create, Bin
     @bin = Bin.create(bin_params)
+    flash[:error] = @bin.errors.full_messages.join(', ') if @bin.errors.any?
     @bins = Bin.all
     @bins = @bins.paginate(:page => params[:page], :per_page => 25)
     respond_to do |format|
@@ -91,7 +92,7 @@ class BinsController < ApplicationController
   private
 
   def bin_params
-    params.require(:bin).permit(:name, :_type)
+    params.require(:bin).permit(:name, :_type, :warehouse_id)
   end
   
 end
