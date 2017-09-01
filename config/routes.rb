@@ -61,6 +61,11 @@ Rails.application.routes.draw do
       resources :discount_codes
       resources :discount_code_effects, only: [:edit, :update]
       resources :discount_code_rules, only: [:new, :create, :destroy]
+      resources :email_deliveries do
+        collection do
+          post :datatables
+        end
+      end
       resources :equipment
       resources :equipment_imports
       resources :equipment_alerts
@@ -139,8 +144,11 @@ Rails.application.routes.draw do
       resources :prices
       resources :price_imports
       resources :purchase_orders do
-        member do
+        collection do 
+          post :datatables
           get :line_items_from_order
+        end          
+        member do
           put :lock
           put :resend_invoice
           put :resend_order
@@ -238,6 +246,11 @@ Rails.application.routes.draw do
   namespace :api, defaults: {format: :json} do
     scope :v1 do
       resources :equipment_alerts, only: [:index, :show, :create, :update]
+      resources :email_deliveries do
+        collection do
+          post :webhook
+        end
+      end
     end
   end
 
