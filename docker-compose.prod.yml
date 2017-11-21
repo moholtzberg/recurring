@@ -13,9 +13,6 @@ services:
     command: bundle exec sidekiq
     volumes:
       - .:/recurring
-    links:
-      - db
-      - redis
   db:
     restart: always
     image: postgres
