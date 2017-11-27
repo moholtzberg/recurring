@@ -157,7 +157,9 @@ class EssendantXmlImportWorker
       description = noko.css("[type=Item_Consolidated_Copy]").text
    
       item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price)
-    
+      
+      Price.create(item_id: item.id, combinable: true, price: actual_price, type: '_Default')
+
       Image.delete_all(:attachable_id => item.id)
 
       image_array = []
