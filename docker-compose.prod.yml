@@ -1,43 +1,25 @@
 version: "3.2"
 services:
-  redis:
-    restart: always
-    image: redis
-    command: redis-server
-    volumes:
-      - redis:/data
-    expose:
-      - "6379"
   sidekiq:
     build: .
+    environment:
+      RAILS_ENV: production
     command: bundle exec sidekiq
-    volumes:
-      - .:/recurring
-  db:
-    restart: always
-    image: postgres
-    volumes:
-      - postgresql-data:/var/lib/postgresql/data
-  solr:
+  web_1:
     build: .
-    expose:
-      - "80"
-    volumes:
-      - .:/recurring
-    command: bundle exec rake sunspot:solr:run
-  web:
-    build: .
-    command: rails server -p 3000 -b '0.0.0.0'
-    volumes:
-      - .:/recurring
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3000
     ports:
       - "3000:3000"
-    links:
-      - solr
     stdin_open: true
     tty: true
-volumes:
-  postgresql-data:
-    external: true
-  redis:
-    external: true
+  web_2:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3000
+    ports:
+      - "3001:3001"
+    stdin_open: true
+    tty: true
