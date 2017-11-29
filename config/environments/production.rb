@@ -59,12 +59,12 @@ Rails.application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
 
   # Use a different cache store in production.
-  # config.cache_store = :mem_cache_store
+  config.cache_store = :dalli_store, 'memcache:11211', {:expires_in => 1.day, :compress => true }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   
-  config.action_controller.asset_host = "www.supply.us/"
-  config.action_mailer.default_url_options = { :host => "http://www.supply.us" }
+  config.action_controller.asset_host = "www.247officesupply.com/"
+  config.action_mailer.default_url_options = { :host => "www.247officesupply.com" }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

@@ -1,0 +1,38 @@
+version: "3.2"
+services:
+  sidekiq:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec sidekiq
+  memcache:
+    restart: always
+    image: memcached
+    command: memcached
+    expose:
+      - "11211"
+  logspout:
+    image: gliderlabs/logspout:latest
+    command: 'syslog://logs6.papertrailapp.com:18256'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  web_1:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3000
+    ports:
+      - "3000:3000"
+    links:
+      - memcache
+      - logspout
+  web_2:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3001
+    ports:
+      - "3001:3001"
+    links:
+      - memcache
+      - logspout
