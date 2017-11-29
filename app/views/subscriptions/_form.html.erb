@@ -18,9 +18,9 @@
 					});
 					var $el = $("#subscription_address_id, #subscription_bill_address_id");
 					$el.empty(); // remove old options
-					$.each(ui.item.addresses, function(key,value) {
+					$.each(ui.item.addresses, function(index,value) {
 					  $el.append($("<option></option>")
-					     .attr("value", value).text(key));
+					     .attr("value", value.id).text(value.name));
 					});
 					$("#subscription_account_name" ).val(ui.item.value);
 	        return false;
