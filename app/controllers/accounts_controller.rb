@@ -17,7 +17,7 @@ class AccountsController < ApplicationController
           :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}",
           :credit_cards => (a.main_service.credit_cards.map {|cc| ["**** **** **** #{cc.last_4.to_i}", cc.id] }.to_h if a.main_service),
           :orders => a.orders.map {|o| {label:  o.number, value: o.id, unauthorized_payment: o.unauthorized_payment_amount } },
-          :addresses => a.addresses.map { |addr| [addr.name, addr.id] }.to_h
+          :addresses => a.addresses.map { |b| {name: b.name, address_1: b.address_1, address_2: b.address_2, city: b.city, state: b.state, zip: b.zip, phone: b.phone, id: b.id } }
         } 
       }
       format.json {render :json => msg}
