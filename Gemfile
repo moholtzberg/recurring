@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.7.1'
 
 gem 'sqlite3', group: :development
 gem 'pg'
@@ -83,3 +83,4 @@ gem "select2-rails"
 gem 'friendly_id', '~> 5.1.0'
 gem 'summernote-rails'
 gem 'bootstrap-datepicker-rails'
+gem 'paper_trail'

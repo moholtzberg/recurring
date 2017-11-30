@@ -1,0 +1,45 @@
+version: "3.2"
+services:
+  sidekiq:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec sidekiq
+  memcache:
+    restart: always
+    image: memcached
+    command: memcached
+    expose:
+      - "11211"
+  web_1:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3000
+    ports:
+      - "3000:3000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    links:
+      - memcache
+    stdin_open: true
+    tty: true
+  web_2:
+    build: .
+    environment:
+      RAILS_ENV: production
+    command: bundle exec unicorn -p 3001
+    ports:
+      - "3001:3001"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+    links:
+      - memcache
+    stdin_open: true
+    tty: true

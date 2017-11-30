@@ -1,5 +1,5 @@
 class Customer < Account
-  
+  has_paper_trail
   self.inheritance_column = 'account_type'
   
   belongs_to :user

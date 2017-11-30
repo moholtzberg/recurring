@@ -157,8 +157,10 @@ class EssendantXmlImportWorker
       description = noko.css("[type=Item_Consolidated_Copy]").text
    
       item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price)
-    
-      Image.delete_all(:item_id => item.id)
+      
+      Price.create(item_id: item.id, combinable: true, price: list_price, type: '_Default')
+
+      Image.delete_all(:attachable_id => item.id)
 
       image_array = []
       image_array.push noko.xpath("//oa:DrawingAttachment//oa:FileName").text
@@ -176,18 +178,18 @@ class EssendantXmlImportWorker
         add_log "-------image --> #{image}"
         if image
           item_images = item.images
-          unless Image.find_by(item_id: id, attachment_file_name: image)
-            img = Image.create(:item_id => id, :attachment_file_name => image, :position => pos)
+          unless Image.find_by(attachable_id: id, attachment_file_name: image)
+            img = Image.create(:attachable_id => id, :attachment_file_name => image, :position => pos)
             img.upload_from_oppictures_to_s3 unless image == "NOA.JPG"
           else
-            img = Image.find_by(id: item.images.first.id).update_attributes(:item_id => current_item_id, :attachment_file_name => image, :position => pos) unless image == "NOA.JPG"
+            img = Image.find_by(id: item.images.first.id).update_attributes(:attachable_id_id => current_item_id, :attachment_file_name => image, :position => pos) unless image == "NOA.JPG"
             img.upload_from_oppictures_to_s3 unless image == "NOA.JPG"
           end
         end
 
       end
 
-      noa_image = Image.find_by(:item_id => current_item_id, :attachment_file_name => "NOA.JPG")
+      noa_image = Image.find_by(:attachable_id => current_item_id, :attachment_file_name => "NOA.JPG")
 
       if noa_image.present?
         noa_image.delete
