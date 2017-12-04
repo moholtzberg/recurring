@@ -122,6 +122,7 @@ class CheckoutController < ApplicationController
       @payment.credit_card_id = @card&.id
     else
       @payment.payment_type =  'CheckPayment'
+      @payment.amount = 0
       @payment = @payment.becomes CheckPayment
     end
     @cards = current_user.account.main_service.credit_cards

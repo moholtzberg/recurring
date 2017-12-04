@@ -9,7 +9,7 @@ class Payment < ActiveRecord::Base
   accepts_nested_attributes_for :order_payment_applications
   before_save :check_payment_method
 
-  validates :amount, :presence => true, :numericality => { greater_then: 0 }
+  validates :amount, :presence => true
   validates :payment_method, :presence => true
   validate :amount_refunded
   validate :not_over_applying
