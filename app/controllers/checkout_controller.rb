@@ -42,12 +42,8 @@ class CheckoutController < ApplicationController
     if !params[:checkout][:account_id].blank?
       cart.account_id = params[:checkout][:account_id]
     end
-    if cart.account_id.nil?
-      if current_user.has_account
-        cart.account_id = current_user.account.id
-        cart.sales_rep_id = current_user.account.sales_rep_id
-      end
-    end
+    cart.account_id ||= current_user&.account_id
+    cart.sales_rep_id ||= current_user&.account&.sales_rep_id
     cart.order_line_items.each {|c| c.price = c.item.actual_price(cart.account_id, c.quantity)}
 
     cart.update_attributes(checkout_params)

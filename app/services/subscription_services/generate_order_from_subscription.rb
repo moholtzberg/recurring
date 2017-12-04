@@ -4,6 +4,7 @@ module SubscriptionServices
       if subscription
         order = subscription.orders.build({
           account_id: subscription.account_id,
+          sales_rep_id: subscription.account.sales_rep_id
           ship_to_account_name: subscription.account.name,
           ship_to_address_1: subscription.ship_to_address.address_1,
           ship_to_address_2: subscription.ship_to_address.address_2,
