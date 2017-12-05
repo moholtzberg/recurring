@@ -25,7 +25,7 @@ class SubscriptionMailer < ApplicationMailer
       eventable_type: 'Subscription',
       eventable_id: @subscription.id
     })
-    email.mailgun_variables = {message_id: @email_delivery.id}
+    email.mailgun_variables = {identifier: @email_delivery.id}
   end
   
 end

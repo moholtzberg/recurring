@@ -42,12 +42,8 @@ class CheckoutController < ApplicationController
     if !params[:checkout][:account_id].blank?
       cart.account_id = params[:checkout][:account_id]
     end
-    if cart.account_id.nil?
-      if current_user.has_account
-        cart.account_id = current_user.account.id
-        cart.sales_rep_id = current_user.account.sales_rep_id
-      end
-    end
+    cart.account_id ||= current_user&.account_id
+    cart.sales_rep_id ||= current_user&.account&.sales_rep_id
     cart.order_line_items.each {|c| c.price = c.item.actual_price(cart.account_id, c.quantity)}
 
     cart.update_attributes(checkout_params)
@@ -126,6 +122,7 @@ class CheckoutController < ApplicationController
       @payment.credit_card_id = @card&.id
     else
       @payment.payment_type =  'CheckPayment'
+      @payment.amount = 0
       @payment = @payment.becomes CheckPayment
     end
     @cards = current_user.account.main_service.credit_cards
@@ -169,7 +166,9 @@ class CheckoutController < ApplicationController
       puts "GOING INTO THE MAILER"
       flash[:notice] = 'Thank you for your order!'
       redirect_to my_account_order_path(@cart.number)
-      # OrderMailer.order_confirmation(c.id, :bcc => "sales@247officesupply.com").deliver_later
+      if Rails.env.production?
+        OrderMailer.order_confirmation(c.id, :bcc => "sales@247officesupply.com").deliver_later
+      end
     end
   end
   

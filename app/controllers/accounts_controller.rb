@@ -9,15 +9,12 @@ class AccountsController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      msg = @accounts.map {|a| 
+      msg = @accounts.includes(:addresses, account_payment_services: :credit_cards).map {|a| 
         {
           :label => "#{a.name} #{a.group_name.present? ? "(" + a.group_name + ")" : nil}", :value => "#{a.name}",
           :name => "#{a.name}",
           :address_1 => "#{a.address_1}", :address_2 => "#{a.address_2}", :city => "#{a.city}", text: a.name, id: a.id,
-          :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}",
-          :credit_cards => (a.main_service.credit_cards.map {|cc| ["**** **** **** #{cc.last_4.to_i}", cc.id] }.to_h if a.main_service),
-          :orders => a.orders.map {|o| {label:  o.number, value: o.id, unauthorized_payment: o.unauthorized_payment_amount } },
-          :addresses => a.addresses.map { |b| {name: b.name, address_1: b.address_1, address_2: b.address_2, city: b.city, state: b.state, zip: b.zip, phone: b.phone, id: b.id } }
+          :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}"
         } 
       }
       format.json {render :json => msg}
@@ -33,6 +30,14 @@ class AccountsController < ApplicationController
     puts @account.inspect
     @orders = Order.where(account_id: @account.id).includes(:order_line_items).order(:submitted_at)
     @item_prices = Price.where(appliable: @account).includes(:item)
+    respond_to do |format|
+      format.html
+      msg = {
+              credit_cards: (@account.main_service.credit_cards.map {|cc| ["**** **** **** #{cc.last_4.to_i}", cc.id] }.to_h if @account.main_service),
+              addresses: @account.addresses.map { |b| {name: b.name, address_1: b.address_1, address_2: b.address_2, city: b.city, state: b.state, zip: b.zip, phone: b.phone, id: b.id } }
+            }
+      format.json { render :json => msg }
+    end
   end
   
   def edit

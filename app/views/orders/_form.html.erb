@@ -22,21 +22,24 @@
 							return false;
 						},
 						select: function( event, ui ) {
-							addresses = ui.item.addresses
-							console.log(addresses);
-							var $el = $(".billing_address, .shipping_address");
-							$el.empty();
-							$el.append($("<option value></option>"));
-							$.each(ui.item.addresses, function(index,value) {
-							  $el.append($("<option></option>")
-							     .attr("value", value.id).text(value.name));
+							$.ajax({
+								url : '/admin/accounts/' + ui.item.id + '.json',
+								success: function(data) {
+									addresses = data.addresses
+									var $el = $(".billing_address, .shipping_address");
+									$el.empty();
+									$el.append($("<option value></option>"));
+									$.each(data.addresses, function(index,value) {
+									  $el.append($("<option></option>")
+									     .attr("value", value.id).text(value.name));
+									});
+								}
 							});
 							return false;
 						}
 					})
 	        $('select.billing_address').change(function(){
 	          var $select = $(this);
-	          console.log(addresses);
 	          var current_address = addresses.filter(function(item){return item.id == (parseInt( $select.val() ) || null) })[0];
 	          $(':input#order_bill_to_address_1').val(current_address['address_1']);
 	          $(':input#order_bill_to_address_2').val(current_address['address_2']);

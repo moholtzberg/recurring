@@ -6,7 +6,7 @@ module Api
     skip_before_filter :check_authorization, only: :webhook
 
     def webhook
-      @email_delivery = EmailDelivery.find(params[:message_id])
+      @email_delivery = EmailDelivery.find(params[:identifier])
       if @email_delivery && EmailDelivery.verify_webhook(params[:token], params[:timestamp], params[:signature])
         attribute = case params[:event]
           when 'delivered' then 'delivered_at'
