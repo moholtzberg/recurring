@@ -180,10 +180,16 @@ class EssendantXmlImportWorker
           item_images = item.images
           unless Image.find_by(attachable_id: id, attachment_file_name: image)
             img = Image.create(:attachable_id => id, :attachment_file_name => image, :position => pos)
-            img.upload_from_oppictures_to_s3 unless image == "NOA.JPG"
+            unless image == "NOA.JPG"
+              img.upload_from_oppictures_to_s3 
+              img.set_attachment_from_oppictures
+            end
           else
             img = Image.find_by(id: item.images.first.id).update_attributes(:attachable_id_id => current_item_id, :attachment_file_name => image, :position => pos) unless image == "NOA.JPG"
-            img.upload_from_oppictures_to_s3 unless image == "NOA.JPG"
+            unless image == "NOA.JPG"
+              img.upload_from_oppictures_to_s3 
+              img.set_attachment_from_oppictures
+            end
           end
         end
 

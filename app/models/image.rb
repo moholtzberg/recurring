@@ -26,4 +26,8 @@ class Image < Asset
 
   end
 
+  def set_attachment_from_oppictures
+    self.attachment = URI.parse("http://content.oppictures.com/Master_Images/Master_Variants/Variant_500/#{attachment_file_name}").open
+    self.save
+  end
 end

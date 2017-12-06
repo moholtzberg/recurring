@@ -17,7 +17,7 @@
 				<% if i.qty > 0 %>
 				<tr>
 					<td>
-						<%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/#{i.item.default_image_path}", :class => "media-object", :height => "64", :width => "64" %>
+						<%= image_tag i.item.default_image_path, :class => "media-object", :height => "64", :width => "64" %>
 					</td>
 					<td><%= link_to "#{i.item.number}", "#{i.item.category.slug unless i.item.category.nil?}/#{i.item.slug}" %></td>
 					

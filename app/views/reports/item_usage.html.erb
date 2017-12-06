@@ -16,7 +16,7 @@
       <td><%= li.number %></td>
       <td>
         <% if li.item.images.size > 0 %>
-          <%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/#{li.item.default_image_path}", :class => "media-object", :height => "64", :width => "64" %>
+          <%= image_tag li.item.default_image_path, :class => "media-object", :height => "64", :width => "64" %>
         <% else %>
           <%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/NOA.JPG", :class => "media-object", :height => "64", :width => "64" %>
         <% end %>
