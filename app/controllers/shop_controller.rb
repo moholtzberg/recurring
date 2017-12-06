@@ -183,7 +183,7 @@ class ShopController < ApplicationController
   def view_account
     @account = Customer.find_by(:id => params[:account_id])
     if current_user.my_account_ids.include?(@account.id)
-      @orders = @account.orders.is_submitted.includes(:order_shipping_method).order(:submitted_at).paginate(:page => params[:page], :per_page => 10)
+      @orders = @account.orders.order(:submitted_at).paginate(:page => params[:page], :per_page => 10)
     else
       redirect_to "/"
     end
@@ -232,7 +232,7 @@ class ShopController < ApplicationController
       @payment.save
       OrderPaymentApplication.create(:order_id => @invoice.id, :payment_id => @payment.id, :applied_amount => @payment.amount)
       flash[:notice] = 'Your payment was authorized successfully.'
-      redirect_to my_account_orders_path
+      redirect_to "/my_account/#{current_user.account_id}"
     else
       render 'view_invoice'
     end
