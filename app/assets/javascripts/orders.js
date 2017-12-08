@@ -12,6 +12,7 @@ $(document).on('turbolinks:load', function() {
       "processing": true,
       "serverSide": true,
       "responsive": true,
+      "stateSave": true,
       "sServerMethod": 'POST',
       "ajax": {
         "url": $('#orders-table').data('source'),

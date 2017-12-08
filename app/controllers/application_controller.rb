@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   
   before_action :check_authorization
   before_action :miniprofiler
-  
+  before_action :set_paper_trail_whodunnit
   
   if Rails.env.production?
     unless Rails.application.config.consider_all_requests_local

@@ -202,6 +202,11 @@ Rails.application.routes.draw do
         get :reset_password
       end
       resources :vendors
+      resources :versions do
+        collection do
+          post :datatables
+        end
+      end
       resources :warehouses
       get "items/delete/:id" => "items#delete"
       get "/" => "home#show"

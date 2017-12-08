@@ -2,6 +2,7 @@ class Item < ActiveRecord::Base
 
   include ApplicationHelper
   extend FriendlyId
+  has_paper_trail
   friendly_id :number, use: [:slugged, :history]
 
   scope :active, -> { where(:active => true)}
