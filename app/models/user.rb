@@ -57,5 +57,12 @@ class User < ActiveRecord::Base
     sql = "Delete from users_roles Where (user_id=#{self.id} AND role_id=#{role.id})"
     ActiveRecord::Base.connection.execute(sql)
   end
-  
+
+  def self.current
+    Thread.current[:current_user]
+  end
+
+  def self.current=(usr)
+    Thread.current[:current_user] = usr
+  end  
 end
