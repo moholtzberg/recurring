@@ -6,7 +6,7 @@ class OrdersController < ApplicationController
 
   def datatables
     authorize! :read, Order
-    render json: OrderDatatable.new(view_context, from: params[:from])
+    render json: OrderDatatable.new(view_context, from: params[:from], filters: params[:filters])
   end
 
   def autocomplete
@@ -116,39 +116,57 @@ class OrdersController < ApplicationController
   def lock
     authorize! :update, Order
     @order.update_attribute(:locked, !@order.locked)
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
   
   def approve
     authorize! :update, Order
     @order.approve
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
 
   def submit
     authorize! :update, Order
     @order.submit
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
 
   def cancel
     authorize! :update, Order
     @order.cancel
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
   
   def credit_hold
     authorize! :update, Order
     @order.credit_hold = !@order.credit_hold
     @order.save
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
   
   def credit_hold_remove
     authorize! :update, Order
     @order.credit_hold = false
     @order.save
-    render 'update'
+    respond_to do |format|
+      format.html { redirect_to action: 'edit', id: @order.id }
+      format.js { render :update }
+    end
   end
 
   def unpaid
@@ -189,5 +207,5 @@ class OrdersController < ApplicationController
 
   def set_order
     @order = Order.find(params[:id])
-  end  
+  end
 end

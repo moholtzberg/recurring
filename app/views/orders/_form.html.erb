@@ -4,7 +4,7 @@
 		
 		<div class="col-md-12">
 			
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<%= f.label :account_name, :class => "control-label" %>
 				<%= f.text_field :account_name, :class => "form-control", data: {autocomplete_source: accounts_path} %>
 			</div>
@@ -85,9 +85,14 @@
 				<% end %>
 			</div>
 			
-			<div class="col-md-3">
+			<div class="col-md-2">
 				<%= f.label "Sales Rep" %>
 				<%= f.text_field(:sales_rep_name, :class => "form-control", data: {autocomplete_source: sales_reps_path}) %>
+			</div>
+
+			<div class="col-md-2">
+				<%= f.label "State" %>
+				<%= f.text_field(:state, :disabled => true, :class => "form-control") %>
 			</div>
 			
 			<script>
