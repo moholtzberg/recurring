@@ -10,6 +10,7 @@ class Item < ActiveRecord::Base
 
   has_many :item_vendor_prices
   has_many :images, as: :attachable
+  has_one :default_image, -> { limit(1).order(:id) }, as: :attachable, class_name: 'Image'
   has_many :documents, as: :attachable
   has_many :assets, -> { order(position: :asc) }, as: :attachable
   has_many :order_line_items
@@ -26,6 +27,9 @@ class Item < ActiveRecord::Base
   has_many :item_lists, through: :item_item_lists
   has_many :item_item_lists, dependent: :destroy
   has_many :prices
+  has_one :default_price, -> { actual._public.default.limit(1).order(:price) }, class_name: 'Price'
+  has_one :recurring_price, -> { actual.recurring.limit(1).order(:price) }, class_name: 'Price'
+  has_many :bulk_prices, -> { actual.bulk.order('min_qty asc') }, class_name: 'Price'
   belongs_to :category
   belongs_to :brand
   belongs_to :model
@@ -157,10 +161,6 @@ class Item < ActiveRecord::Base
 
   def cheapest_vendor_price
     item_vendor_prices.where.not(price: 0).order(price: :asc).first
-  end
-
-  def default_price
-    prices.actual._public.default.minimum(:price).to_f
   end
 
   def actual_price(account_id = nil, quantity = nil)
