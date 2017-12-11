@@ -37,7 +37,38 @@ class OrderDatatable < AjaxDatatablesRails::Base
   private
 
   def get_raw_records
-    Order.eager_load({:account => [:group]}, {:order_line_items => [:line_item_shipments, :line_item_fulfillments]}, :order_tax_rate, :order_payment_applications => [:payment])
+    orders = Order.eager_load({:account => [:group]}, {:order_line_items => [:line_item_shipments, :line_item_fulfillments]}, :order_tax_rate, :order_payment_applications => [:payment])
+    orders.where(filter_query(options[:filters]))
   end
 
+  def filter_query(filters)
+    query = []
+    filters.to_a.each do |_, f|
+      source = view_columns[f['column_name'].to_sym][:source]
+      if source.include?('.')
+        model = source.split('.').first.constantize
+        table = model.arel_table rescue model
+        field = source.split('.').last.to_sym
+        source = "#{table.name}.#{field}"
+      end
+      source = source + "::date" if f['column_name'] == 'submitted_at'
+      query.push case f['filter']
+                 when 'Equal to'
+                   "#{source} = '#{f['value']}'"
+                 when 'Contains'
+                   "#{source} like '%#{f['value']}%'"
+                 when 'Begins with'
+                   "#{source} like '#{f['value']}%'"
+                 when 'Ends with'
+                   "#{source} like '#{f['value']}%'"
+                 when 'Not equal to'
+                   "#{source} <> '#{f['value']}'"
+                 when 'Greater than'
+                   "#{source} > '#{f['value']}'"
+                 when 'Less than'
+                   "#{source} < '#{f['value']}'"
+                 end
+    end
+    query.join(' AND ')
+  end
 end

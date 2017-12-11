@@ -1,6 +1,7 @@
 class Order < ActiveRecord::Base
   
   include ApplicationHelper
+  has_paper_trail
   
   scope :is_locked, -> () { where(:locked => true) }
   scope :is_complete, -> () { where(state: [:completed, :fulfilled])}

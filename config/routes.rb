@@ -202,6 +202,11 @@ Rails.application.routes.draw do
         get :reset_password
       end
       resources :vendors
+      resources :versions do
+        collection do
+          post :datatables
+        end
+      end
       resources :warehouses
       get "items/delete/:id" => "items#delete"
       get "/" => "home#show"
@@ -226,7 +231,7 @@ Rails.application.routes.draw do
         patch :details, action: :update_details
       end
     end
-    resources :orders, param: :order_number, only: [:index, :show, :return]
+    resources :orders, param: :order_number, only: [:show, :return]
     resources :return_authorizations, only: [:new, :create]
   end
 

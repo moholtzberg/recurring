@@ -4,7 +4,7 @@
 		<div class="col-md-9 col-xs-12">
 			<div class="media-left">
 				<a href="#">
-					<%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/#{i.default_image_path}", :class => "media-object", :height => "100", :width => "100" %>
+					<%= image_tag i.default_image_path, :class => "media-object", :height => "100", :width => "100" %>
 				</a>
 			</div>
 			<div class="media-body">
@@ -26,11 +26,11 @@
 				<%= form_for @cart, url: add_to_cart_path, :class => "form-inline", :remote => true do |f| %>
 					<div class="form-group">
 
-						<% if i.actual_price(current_user.try(:account_id)) < i.default_price %>
-						<h5 class="text-center"><span class="hidden-xs">List Price:</span> <span style="text-decoration:line-through;"><%= number_to_currency(i.default_price) %></span><h5>
+						<% if i.actual_price(current_user.try(:account_id)) < i.default_price&.price %>
+						<h5 class="text-center"><span class="hidden-xs">List Price:</span> <span style="text-decoration:line-through;"><%= number_to_currency(i.default_price&.price) %></span><h5>
 						<h4 class="text-center"><span class="hidden-xs">Your Price:</span> <%= number_to_currency(i.actual_price(current_user.try(:account_id))) %><h4>
 						<% else %>
-						<h4 class="text-center"><span class="hidden-xs">Your Price:</span> <%= number_to_currency(i.default_price) %><h4>
+						<h4 class="text-center"><span class="hidden-xs">Your Price:</span> <%= number_to_currency(i.default_price&.price) %><h4>
 						<% end %>
 						<% if i.prices.actual.recurring.any? %>
 							<input type="submit" name="commit" value="Subscribe (<%= number_to_currency(i.prices.actual.recurring.first.price) %>)" class="btn btn-primary btn-sm btn-block margin-bottom">
