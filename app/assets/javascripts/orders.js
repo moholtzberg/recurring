@@ -2,53 +2,6 @@ var orders_table = null;
 $(document).on('turbolinks:load', function() {
   if ($('#orders-table').length != 0) {
     var common_filters = [];
-    orders_table = $('#orders-table').dataTable({
-      "initComplete": function () {
-        var self = this
-        $('#orders-table').on('filters-update', function() {
-          self.api().ajax.reload()
-        })
-      },
-      "processing": true,
-      "serverSide": true,
-      "responsive": true,
-      "stateSave": true,
-      "sServerMethod": 'POST',
-      "ajax": {
-        "url": $('#orders-table').data('source'),
-        "data": function ( d ) {
-          d.filters = common_filters;
-        }
-      },
-      stateSave: true,
-      stateSaveCallback: function(settings,data) {
-        data.filters = common_filters;
-        key = 'DataTables_' + settings.sInstance + '_' + window.location.pathname
-        localStorage.setItem( key, JSON.stringify(data) )
-      },
-      stateLoadCallback: function(settings) {
-        key = 'DataTables_' + settings.sInstance + '_' + window.location.pathname
-        data = localStorage.getItem( key );
-        if (data.filters) { common_filters = data.filters; }
-        $('#orders-table').trigger('filters-restore')
-        return JSON.parse( data )
-      },
-      "pagingType": "full_numbers",
-      "autoWidth": false,
-      "sDom": 'rt<"row"<"col-sm-2"l><"col-sm-5"i><"col-sm-5"p>>',
-      "columns": [
-        {"data": "number", className: "all"},
-        {"data": "account", className: "all"},
-        {"data": "total", sortable: false, className: "all"},
-        {"data": "sub_total", className: "all"},
-        {"data": "shipped", sortable: false, className: "min-desktop"},
-        {"data": "fulfilled", sortable: false, className: "min-desktop"},
-        {"data": "balance_due", sortable: false, className: "min-desktop"},
-        {"data": "submitted_at", className: "min-desktop"},
-        {"data": "state", className: "all"},
-        {"data": "dropdown", sortable: false, className: "all"}
-      ]
-    });
     $(function() {
 
       var FORMBUILDER = FORMBUILDER || {};
@@ -227,6 +180,53 @@ $(document).on('turbolinks:load', function() {
         FORMBUILDER.filters = JSON.parse(JSON.stringify(common_filters));
         FORMBUILDER.actions.renderFilters();
       })
+    });
+    orders_table = $('#orders-table').dataTable({
+      "initComplete": function () {
+        var self = this
+        $('#orders-table').on('filters-update', function() {
+          self.api().ajax.reload()
+        })
+      },
+      "processing": true,
+      "serverSide": true,
+      "responsive": true,
+      "stateSave": true,
+      "sServerMethod": 'POST',
+      "ajax": {
+        "url": $('#orders-table').data('source'),
+        "data": function ( d ) {
+          d.filters = common_filters;
+        }
+      },
+      stateSave: true,
+      stateSaveCallback: function(settings,data) {
+        data.filters = common_filters;
+        key = 'DataTables_' + settings.sInstance + '_' + window.location.pathname
+        localStorage.setItem( key, JSON.stringify(data) )
+      },
+      stateLoadCallback: function(settings) {
+        key = 'DataTables_' + settings.sInstance + '_' + window.location.pathname
+        data = JSON.parse( localStorage.getItem(key) );
+        if (data && data.filters) { common_filters = data.filters; }
+        $('#orders-table').trigger('filters-restore');
+        return data
+      },
+      "pagingType": "full_numbers",
+      "autoWidth": false,
+      "sDom": 'rt<"row"<"col-sm-2"l><"col-sm-5"i><"col-sm-5"p>>',
+      "columns": [
+        {"data": "number", className: "all"},
+        {"data": "account", className: "all"},
+        {"data": "total", sortable: false, className: "all"},
+        {"data": "sub_total", className: "all"},
+        {"data": "shipped", sortable: false, className: "min-desktop"},
+        {"data": "fulfilled", sortable: false, className: "min-desktop"},
+        {"data": "balance_due", sortable: false, className: "min-desktop"},
+        {"data": "submitted_at", className: "min-desktop"},
+        {"data": "state", className: "all"},
+        {"data": "dropdown", sortable: false, className: "all"}
+      ]
     });
   }
 });
