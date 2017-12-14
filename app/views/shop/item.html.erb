@@ -7,11 +7,11 @@
 	<div class="row">
 		<div class="col-md-3">
 			<% @item.images.each do |img| %>
-				<a><%= image_tag img.attachment.url, :height => "100", :class => "thumbnail", :id => img.id %></a>
+				<a><%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/#{img.path}", :height => "100", :class => "thumbnail", :id => img.id %></a>
 			<% end %>	
 		</div>
 		<div class="col-md-9">
-			<%= image_tag @item.default_image_path, :width => "350", :id => "main_image" %>
+			<%= image_tag "https://s3.amazonaws.com/247officesuppy/400/400/#{@item.images&.first&.path}", :width => "350", :id => "main_image" %>
 		</div>
 	</div>
 	
