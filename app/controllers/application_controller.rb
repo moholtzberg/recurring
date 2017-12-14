@@ -63,7 +63,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_user
-    User.current = User.find_by_id(session[:user_id])
+    User.current = User.find_by_id(session["warden.user.user.key"].try(:[], 0).try(:[], 0))
     yield
   ensure
     # to address the thread variable leak issues in Puma/Thin webserver
