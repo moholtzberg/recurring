@@ -10,7 +10,7 @@ class Image < Asset
   def upload_from_oppictures_to_s3
 
     bucket_name = '247officesuppy/400/400'
-    s3 = Aws::S3.new()
+    s3 = Aws::S3::Resource.new
     bucket = s3.bucket(bucket_name)
 
     image = attachment_file_name
