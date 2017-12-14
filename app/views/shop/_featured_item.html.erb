@@ -14,9 +14,9 @@
 		
 		
 			<div class="text-center">
-				<% if item.actual_price(current_user.try(:account_id)) < item.default_price&.price %>
+				<% if item.current_user_actual_price.price < item.default_price&.price %>
 				<h5><span class="text-danger"><strong><del><%= number_to_currency(item.default_price&.price) %></del></strong></span></h5>
-				<h4><span class="text-default"><strong><%= number_to_currency(item.actual_price(current_user.try(:account_id))) %></strong></span><h4>
+				<h4><span class="text-default"><strong><%= number_to_currency(item.current_user_actual_price.price) %></strong></span><h4>
 				<% else %>
 				<h4><span class="text-default"><%= number_to_currency(item.default_price&.price) %></span><h4>
 				<% end %>

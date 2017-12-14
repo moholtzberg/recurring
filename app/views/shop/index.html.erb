@@ -178,7 +178,7 @@
 
 					<% must_have_items = Category.find_by(:slug => "must-have-items") %>
 				
-					<% Item.joins(:categories).eager_load(:default_image, :default_price, :recurring_price, :bulk_prices, :prices).where('categories.id = ?', must_have_items.id).each_slice(6).with_index do |slice, idx| %>
+					<% Item.joins(:categories).eager_load(:default_price, :current_user_actual_price, :default_image, :recurring_price, :bulk_prices).where('categories.id = ?', must_have_items.id).each_slice(6).with_index do |slice, idx| %>
 						<% active = idx == 0 ? "active" : "" %>
 						
 						<div class="item <%= active %>">
