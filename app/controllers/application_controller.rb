@@ -6,7 +6,6 @@ class ApplicationController < ActionController::Base
   before_action :check_authorization
   before_action :miniprofiler
   before_action :set_paper_trail_whodunnit
-  around_filter :set_current_user
   
   if Rails.env.production?
     unless Rails.application.config.consider_all_requests_local
@@ -61,12 +60,5 @@ class ApplicationController < ActionController::Base
       Rack::MiniProfiler.authorize_request 
     end
   end
-
-  def set_current_user
-    User.current = User.find_by_id(session[:user_id])
-    yield
-  ensure
-    # to address the thread variable leak issues in Puma/Thin webserver
-    User.current = nil
-  end
+  
 end
