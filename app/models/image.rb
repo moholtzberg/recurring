@@ -10,18 +10,18 @@ class Image < Asset
   def upload_from_oppictures_to_s3
 
     bucket_name = '247officesuppy/400/400'
-    s3 = AWS::S3.new()
-    bucket = s3.buckets[bucket_name]
+    s3 = Aws::S3.new()
+    bucket = s3.bucket(bucket_name)
 
     image = attachment_file_name
 
-    if bucket.objects["#{image}"].exists?
+    if bucket.object("#{image}").exists?
 
       puts "----> SINGLE IMAGE = #{image}"
-      bucket.objects["#{image}"].acl = :public_read unless bucket.objects["#{image}"].nil?
+      bucket.object("#{image}").acl = 'public-read' unless bucket.object("#{image}").nil?
     else
-      bucket.objects["#{image}"].write(open("http://content.oppictures.com/Master_Images/Master_Variants/Variant_500/#{image}") {|a| a.read})
-      bucket.objects["#{image}"].acl = :public_read unless bucket.objects["#{image}"].nil?
+      bucket.object("#{image}").write(open("http://content.oppictures.com/Master_Images/Master_Variants/Variant_500/#{image}") {|a| a.read})
+      bucket.object("#{image}").acl = 'public-read' unless bucket.object("#{image}").nil?
     end
 
   end

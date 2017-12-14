@@ -1,7 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'csv'
-require 'aws-sdk-v1'
+require 'aws-sdk'
 require 'rails/all'
 require 'wicked_pdf'
 # require 'mechanize'
