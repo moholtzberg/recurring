@@ -158,7 +158,7 @@ class EssendantXmlImportWorker
    
       item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price)
       
-      Price.create(item_id: item.id, combinable: true, price: list_price, type: '_Default')
+      Price.create(item_id: item.id, combinable: true, price: list_price, _type: 'Default')
 
       Image.delete_all(:attachable_id => item.id)
 
