@@ -190,6 +190,8 @@ Rails.application.routes.draw do
       resources :sales_reps
       resources :schedules
       resources :settings
+      resources :shipping_methods
+      resources :shipping_calculators
       resources :static_pages
       resources :subscriptions do
         member do
@@ -264,7 +266,7 @@ Rails.application.routes.draw do
   
   get "/pages/:static_page" => "shop#page"
   get "/categories/:parent_id" => "shop#categories"
-  get "/:category/:item" => "shop#item"
+  get "/:category/:item" => "shop#item", as: :shop_item
   get "/:category" => "shop#category"
   get "/" => "shop#index"
   
