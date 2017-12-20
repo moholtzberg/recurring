@@ -192,6 +192,7 @@ Rails.application.routes.draw do
       resources :settings
       resources :shipping_methods
       resources :shipping_calculators
+      resources :sku_groups
       resources :static_pages
       resources :subscriptions do
         member do
