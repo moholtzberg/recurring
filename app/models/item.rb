@@ -98,11 +98,11 @@ class Item < ActiveRecord::Base
   end
 
   def index_async
-    ItemIndexWorker.perform_async(id)
+    DataMaintenance::ItemIndexWorker.perform_async(id)
   end
 
   def essendant_xml_import_async
-    EssendantXmlImportWorker.perform_async(id)
+    DataImports::EssendantXmlImportWorker.perform_async(id)
   end
 
   def category_name
