@@ -17,7 +17,7 @@ module DataImports
       path = File.expand_path("#{SHARED_DIR}/ecdb.individual_items")
   
       begin
-        noko = File.open("shared/ecdb.individual_items/#{item.number}.xml") { |f| Nokogiri::XML(f) }
+        noko = File.open("/#{path}/#{item.number}.xml") { |f| Nokogiri::XML(f) }
       rescue
     
         unless item.number.ends_with? "COMP"
