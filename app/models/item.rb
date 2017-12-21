@@ -31,6 +31,8 @@ class Item < ActiveRecord::Base
   has_one :recurring_price, -> { actual.recurring.limit(1).order(:price) }, class_name: 'Price'
   has_many :bulk_prices, -> { actual.bulk.order('min_qty asc') }, class_name: 'Price'
   has_one :current_user_actual_price, -> { actual.where('(prices.appliable_type = ? AND prices.appliable_id = ?) OR (prices.appliable_type = ? AND prices.appliable_id = ?) OR (prices.appliable_type IS NULL AND prices.appliable_id IS NULL)', (User.current&.account_id ? 'Account' : nil), User.current&.account_id, (User.current&.account_id ? 'Group' : nil), (User.current&.account_id ? Account.find(User.current&.account_id).group_id : nil)).where('prices._type IN (?) AND prices.min_qty IS NULL AND prices.max_qty IS NULL', ['Default', 'Sale']) }, class_name: 'Price'
+  belongs_to :sku_group
+  delegate :name, to: :sku_group, allow_nil: true, prefix: true
   belongs_to :category
   belongs_to :brand
   belongs_to :model
@@ -243,5 +245,14 @@ class Item < ActiveRecord::Base
 
   def one_default_price
     errors.add(:base, "Item needs to have at least one default price") if prices.select { |p| !p.marked_for_destruction? && p._type == 'Default' }.length == 0
+  end
+
+  def default_price_value
+    default_price.price
+  end
+
+  def sku_group_neighbours
+    Item.where(sku_group_id: sku_group_id)
+        .where.not(id: id).where.not(sku_group_id: nil)
   end
 end

@@ -25,7 +25,7 @@ class OrderMailer < ApplicationMailer
       eventable_type: 'Order',
       eventable_id: @order.id
     })
-    headers['X-Mailgun-Variables'] = {identifier: @email_delivery.id}
+    headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
   def invoice_notification(order_id, options = {})
@@ -62,7 +62,7 @@ class OrderMailer < ApplicationMailer
       eventable_type: 'Order',
       eventable_id: @order.id
     })
-    headers['X-Mailgun-Variables'] = {identifier: @email_delivery.id}
+    headers['X-Mailgun-Variables'] = @email_delivery.id
   end
 
   def order_failed_authorization(order_id, options = {})
@@ -90,6 +90,6 @@ class OrderMailer < ApplicationMailer
       eventable_type: 'Order',
       eventable_id: @order.id
     })
-    headers['X-Mailgun-Variables'] = {identifier: @email_delivery.id}
+    headers['X-Mailgun-Variables'] = @email_delivery.id
   end
 end

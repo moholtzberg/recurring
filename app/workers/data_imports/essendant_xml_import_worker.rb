@@ -1,6 +1,6 @@
 module DataImports
   
-  class EssendantXmlImportWorker  
+  class EssendantXmlImportWorker
     include Sidekiq::Worker
     include JobLogger
     sidekiq_options :backtrace => true
@@ -13,7 +13,7 @@ module DataImports
       add_log "START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #{id}"
   
       current_item_id = id
-  
+
       path = File.expand_path("#{SHARED_DIR}/ecdb.individual_items")
   
       begin
@@ -159,10 +159,25 @@ module DataImports
         description = noko.css("[type=Item_Consolidated_Copy]").text
    
         item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price)
-      
+        
+        sku_group_name = noko.at('[name="SKU_Group_Name"]')&.text
+        sku_group_image_name = noko.at('//us:SkuGroupImage')&.text
+        sku_group = SkuGroup.find_or_create_by(name: sku_group_name)
+        if sku_group_image_name
+          sku_img = Image.find_or_create_by(
+            attachable_type: 'SkuGroup',
+            attachable_id: sku_group.id,
+            attachment_file_name: sku_group_image_name
+          )
+          unless sku_group_image_name == 'NOA.JPG'
+            sku_img.upload_from_oppictures_to_s3
+            sku_img.set_attachment_from_oppictures
+          end
+        end
+
         Price.create(item_id: item.id, combinable: true, price: list_price, _type: 'Default')
 
-        Image.delete_all(:attachable_id => item.id)
+        Image.delete_all(:attachable_id => item.id, :attachable_type => 'Item')
 
         image_array = []
         image_array.push noko.xpath("//oa:DrawingAttachment//oa:FileName").text
@@ -180,14 +195,14 @@ module DataImports
           add_log "-------image --> #{image}"
           if image
             item_images = item.images
-            unless Image.find_by(attachable_id: id, attachment_file_name: image)
-              img = Image.create(:attachable_id => id, :attachment_file_name => image, :position => pos)
+            unless Image.find_by(attachable_type: 'Item', attachable_id: id, attachment_file_name: image)
+              img = Image.create(attachable_type: 'Item', attachable_id: id, attachment_file_name: image, position: pos)
               unless image == "NOA.JPG"
                 img.upload_from_oppictures_to_s3 
                 img.set_attachment_from_oppictures
               end
             else
-              img = Image.find_by(id: item.images.first.id).update_attributes(:attachable_id_id => current_item_id, :attachment_file_name => image, :position => pos) unless image == "NOA.JPG"
+              img = Image.find_by(id: item.images.first.id).update_attributes(:attachable_type => 'Item', :attachable_id_id => current_item_id, :attachment_file_name => image, :position => pos) unless image == "NOA.JPG"
               unless image == "NOA.JPG"
                 img.upload_from_oppictures_to_s3 
                 img.set_attachment_from_oppictures
@@ -197,7 +212,7 @@ module DataImports
 
         end
 
-        noa_image = Image.find_by(:attachable_id => current_item_id, :attachment_file_name => "NOA.JPG")
+        noa_image = Image.find_by(:attachable_type => 'Item', :attachable_id => current_item_id, :attachment_file_name => "NOA.JPG")
 
         if noa_image.present?
           noa_image.delete

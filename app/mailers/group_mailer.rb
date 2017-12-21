@@ -37,7 +37,7 @@ class GroupMailer < ApplicationMailer
       to_email: "#{args[:email].present? ? args[:email] : 'moholtzberg@gmail.com'}",
       body: email[:text].to_s
     })
-    headers['X-Mailgun-Variables'] = {identifier: @email_delivery.id}    
+    headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
 end

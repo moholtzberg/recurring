@@ -6,18 +6,29 @@ module Api
     skip_before_filter :check_authorization, only: :webhook
 
     def webhook
-      @email_delivery = EmailDelivery.find(params[:identifier])
-      if @email_delivery && EmailDelivery.verify_webhook(params[:token], params[:timestamp], params[:signature])
-        attribute = case params[:event]
-          when 'delivered' then 'delivered_at'
-          when 'dropped' then 'failed_at'
-          when 'opened' then 'opened_at'
-        end
-        @code = @email_delivery.update_attribute(attribute.to_sym, DateTime.strptime(params[:timestamp],'%s')) ? 200 : 409
+      @email_delivery = EmailDelivery.find(message_headers['X-Mailgun-Variables'])
+      if EmailDeliveryServices::VerifyWebhook.new.call(params[:token], params[:timestamp], params[:signature])
+        @code = @email_delivery.update_attribute(attribute, time_sent) ? 200 : 409
       else
         @code = 406
       end
-      render json: {status: @code}, status: @code
+      render json: { status: @code }, status: @code
+    end
+
+    def message_headers
+      JSON.parse(params['message-headers']).to_h
+    end
+
+    def time_sent
+      DateTime.strptime(params[:timestamp], '%s')
+    end
+
+    def attribute
+      case params[:event]
+      when 'delivered' then :delivered_at
+      when 'dropped' then :failed_at
+      when 'opened' then :opened_at
+      end
     end
   end
 end

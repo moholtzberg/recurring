@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171130111511) do
+ActiveRecord::Schema.define(version: 20171214201305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -395,6 +395,7 @@ ActiveRecord::Schema.define(version: 20171130111511) do
     t.boolean  "small_package_indicator"
     t.text     "assembly_code"
     t.text     "non_returnable_code"
+    t.integer  "sku_group_id"
   end
 
   add_index "items", ["id"], name: "item_id_ix", using: :btree
@@ -778,6 +779,10 @@ ActiveRecord::Schema.define(version: 20171130111511) do
     t.boolean "active"
     t.float   "minimum_amount"
     t.float   "free_at_amount"
+  end
+
+  create_table "sku_groups", force: :cascade do |t|
+    t.string "name"
   end
 
   create_table "static_pages", force: :cascade do |t|
