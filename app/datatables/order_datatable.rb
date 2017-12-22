@@ -41,34 +41,37 @@ class OrderDatatable < AjaxDatatablesRails::Base
     orders.where(filter_query(options[:filters]))
   end
 
-  def filter_query(filters)
-    query = []
-    filters.to_a.each do |_, f|
-      source = view_columns[f['column_name'].to_sym][:source]
+  def filter_query(q)
+    if q['column_name']
+      source = view_columns[q['column_name'].to_sym][:source]
       if source.include?('.')
         model = source.split('.').first.constantize
         table = model.arel_table rescue model
         field = source.split('.').last.to_sym
         source = "#{table.name}.#{field}"
       end
-      source = source + "::date" if f['column_name'] == 'submitted_at'
-      query.push case f['filter']
-                 when 'Equal to'
-                   "#{source} = '#{f['value']}'"
-                 when 'Contains'
-                   "#{source} like '%#{f['value']}%'"
-                 when 'Begins with'
-                   "#{source} like '#{f['value']}%'"
-                 when 'Ends with'
-                   "#{source} like '#{f['value']}%'"
-                 when 'Not equal to'
-                   "#{source} <> '#{f['value']}'"
-                 when 'Greater than'
-                   "#{source} > '#{f['value']}'"
-                 when 'Less than'
-                   "#{source} < '#{f['value']}'"
-                 end
+      source = source + '::date' if q['column_name'] == 'submitted_at'
+      case q['filter']
+      when 'Equal to'
+        "(#{source} = '#{q['value']}')"
+      when 'Contains'
+        "(#{source} like '%#{q['value']}%')"
+      when 'Begins with'
+        "(#{source} like '#{q['value']}%')"
+      when 'Ends with'
+        "(#{source} like '#{q['value']}%')"
+      when 'Not equal to'
+        "(#{source} <> '#{q['value']}')"
+      when 'Greater than'
+        "(#{source} > '#{q['value']}')"
+      when 'Less than'
+        "(#{source} < '#{q['value']}')"
+      end
+    elsif q['condition'] && !q['children'].empty?
+      subq = q['children'].values.map do |v|
+        filter_query(v)
+      end
+      '(' + subq.join(" #{q['condition']} ") + ')'
     end
-    query.join(' AND ')
   end
 end

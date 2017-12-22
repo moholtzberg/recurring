@@ -44,39 +44,6 @@
       </div>
 
       <div class="modal-body" id="modal-body">
-        <table class="table table-bordered table-condensed">
-          <thead>
-            <tr>
-              <th>Column Name</th>
-              <th>Filter</th>
-              <th>Value</th>
-              <th>&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody class="column-filters">
-            <tr id="add_filter_form">
-              <td>
-                <select id="column_name" class="form-control">
-                  <option value></option>
-                  <option value="number">Number</option>
-                  <option value="account">Account</option>
-                  <option value="sub_total">Sub Total</option>
-                  <option value="submitted_at">Submitted At</option>
-                  <option value="state">State</option>
-                </select>
-              </td>
-              <td>
-                <select id="filter" class="form-control"></select>
-              </td>
-              <td>
-                <input id="value" class="form-control"/>
-              </td>
-              <td>
-                <%= button_tag "Add Filter", :class => "btn btn-primary btn-sm add-filter" %>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <div class="modal-footer">
