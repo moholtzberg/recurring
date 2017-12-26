@@ -3,182 +3,248 @@ $(document).on('turbolinks:load', function() {
   if ($('#orders-table').length != 0) {
     var common_filters = [];
     $(function() {
+      var possible_filters =  {
+                                number: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
+                                account: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
+                                state: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
+                                submitted_at: ['Equal to', 'Greater than', 'Less than'],
+                                sub_total: ['Equal to', 'Greater than', 'Less than']
+                              }
 
-      var FORMBUILDER = FORMBUILDER || {};
-
-      FORMBUILDER.filters = common_filters;
-      FORMBUILDER.saved_filters = [];
-      FORMBUILDER.current_filter = {};
-      FORMBUILDER.possible_column_filters = {
-        number: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
-        account: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
-        state: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
-        submitted_at: ['Equal to', 'Greater than', 'Less than'],
-        sub_total: ['Equal to', 'Greater than', 'Less than']
+      function FilterGroupRoot(children) {
+        this.children = children ? children : [];
+        this.condition = 'and'
       }
 
-      FORMBUILDER.actions = {
-
-        init: function(){
-
-          FORMBUILDER.actions.addFilter();
-          FORMBUILDER.actions.removeFilter();
-          FORMBUILDER.actions.validateForm();
-          FORMBUILDER.actions.fieldValid(key);
-          FORMBUILDER.actions.clearErrors();
-          FORMBUILDER.actions.renderFilters();
-          FORMBUILDER.actions.resetForm();
-          FORMBUILDER.actions.updateCurrentFilter();
-
-        },
-
-        addFilter: function(){
-          FORMBUILDER.actions.clearErrors();
-          if (FORMBUILDER.actions.validateForm()) {
-            FORMBUILDER.filters.push($.extend({}, FORMBUILDER.current_filter));
-            FORMBUILDER.actions.resetForm();
-            FORMBUILDER.actions.renderFilters();
-          }
-        },
-
-        removeFilter: function(e){
-          var index = parseInt($(e.target).closest('tr').data( "index" ));
-          FORMBUILDER.filters.splice(index, 1);
-          FORMBUILDER.actions.resetForm();
-          FORMBUILDER.actions.renderFilters();
-        },
-
-        validateForm: function(){
-          var valid = true;
-          ['column_name', 'filter', 'value'].forEach(function(key){
-            if (!FORMBUILDER.actions.fieldValid(key)) { 
-              $('#add_filter_form #' + key).parent().addClass('has-error');
-              valid = false;
-            }
+      FilterGroupRoot.prototype = {
+        render: function() {
+          var self = this;
+          var template = '<div class="panel panel-default"> \
+                            <div class="panel-heading">Filter Groups</div> \
+                            <div class="panel-body"></div> \
+                            <div class="panel-footer"> \
+                              <button class="btn btn-default add-filter-group">Add Filter Group</button> \
+                            </div> \
+                          </div>';
+          var $item = $(jQuery.parseHTML(template)[0]);
+          $item.children('.panel-footer').find('.add-filter-group').click(function() {
+            self.addItem(new FilterGroup(self));
           })
-          return valid;
+          $.each(self.children, function(i, child) {
+            $item.children('.panel-body').append(child.render());
+          })
+          return $item
         },
+        removeItem: function(item) {
+          idx = this.children.indexOf(item);
+          this.children.splice(idx, 1);
+          $('#filterModal #modal-body').trigger('render');
+        },
+        addItem: function(item) {
+          this.children.push(item);
+          $('#filterModal #modal-body').trigger('render');
+        },
+        toJson: function() {
+          var json = {};
+          json.condition = this.condition;
+          json.children = [];
+          $.each(this.children, function(i, child) {
+            json.children.push(child.toJson());
+          })
+          return json;
+        }
+      }
 
-        fieldValid: function(key) {
-          var value = FORMBUILDER.current_filter[key]
-          switch(key) {
-            case 'column_name':
-              return value
+      function FilterGroup(parent, condition, children) {
+        this.parent = parent;
+        this.condition = condition ? condition : 'and';
+        this.children = children ? children : [];
+      }
+
+      FilterGroup.prototype = {
+        render: function() {
+          var self = this;
+          var template = '<div class="panel panel-default"> \
+                            <div class="panel-heading">Match \
+                              <select> \
+                                <option value="and">All</option> \
+                                <option value="or">Any</option> \
+                              </select> \
+                              conditions \
+                              <button class="btn btn-default remove-filter-group">Remove</button> \
+                            </div> \
+                            <div class="panel-body"></div> \
+                            <div class="panel-footer"> \
+                              <button class="btn btn-default add-filter">Add Filter</button> \
+                              <button class="btn btn-default add-filter-group">Add Filter Group</button> \
+                            </div> \
+                          </div>';
+          var $item = $(jQuery.parseHTML(template)[0]);
+          $item.children('.panel-heading').find('select').val(self.condition);
+          $item.children('.panel-heading').find('.remove-filter-group').click(function() {
+            self.parent.removeItem(self);
+          })
+          $item.children('.panel-footer').find('.add-filter-group').click(function() {
+            self.addItem(new FilterGroup(self));
+          })
+          $item.children('.panel-footer').find('.add-filter').click(function() {
+            self.addItem(new Filter(self));
+          })
+          $item.children('.panel-heading').find('select').change(function() {
+            self.condition = $(this).val();
+          })
+          $.each(self.children, function(i, child) {
+            $item.children('.panel-body').append(child.render());
+          })
+          return $item;
+        },
+        removeItem: function(item) {
+          idx = this.children.indexOf(item);
+          this.children.splice(idx, 1);
+          $('#filterModal #modal-body').trigger('render');
+        },
+        addItem: function(item) {
+          this.children.push(item);
+          $('#filterModal #modal-body').trigger('render');
+        },
+        toJson: function() {
+          var json = {};
+          json.condition = this.condition;
+          json.children = [];
+          $.each(this.children, function(i, child) {
+            json.children.push(child.toJson());
+          })
+          return json;
+        }
+      };
+
+      function Filter(parent, column_name, filter, value) {
+        this.parent = parent;
+        this.column_name = column_name;
+        this.filter = filter;
+        this.value = value;
+      }
+
+      Filter.prototype = {
+        render: function() {
+          var self = this;
+          var template = '<div class="panel panel-default"> \
+                            <div class="panel-heading"> \
+                              <button class="btn btn-default remove-filter">Remove</button> \
+                            </div> \
+                            <div class="panel-body"> \
+                              <select class="column-name" class="form-control"> \
+                                <option value></option> \
+                                <option value="number">Number</option> \
+                                <option value="account">Account</option> \
+                                <option value="sub_total">Sub Total</option> \
+                                <option value="submitted_at">Submitted At</option> \
+                                <option value="state">State</option> \
+                              </select> \
+                              <select class="filter"> \
+                              </select> \
+                              <input class="value"/> \
+                            </div> \
+                          </div>'
+          var $item = $(jQuery.parseHTML(template)[0])
+          $item.find('.remove-filter').click(function() {
+            self.parent.removeItem(self);
+          })
+          self.setColumnName($item, self.column_name);
+          self.setFilter($item, self.filter);
+          self.setValue($item, self.value);
+          $item.find(':input').change(function(e) {
+            self.updateAttribute(e.target.className, $(e.target).val());
+          })
+          return $item;
+        },
+        setColumnName: function(dom_el, val) {
+          dom_el.find(':input.column-name').val(val);
+          this.column_name = val;
+        },
+        setFilter: function(dom_el, val) {
+          $.each(possible_filters[this.column_name], function(index,value) {
+            dom_el.find(':input.filter').append($('<option></option>')
+                  .attr('value', value).text(value));
+          });
+          dom_el.find(':input.filter').val(val);
+          this.filter = val;
+        },
+        setValue: function(dom_el, val) {
+          dom_el.find(':input.value').val(val);
+          if (this.column_name == 'submitted_at') {
+            dom_el.find(':input.value').datepicker();
+          } else {
+            dom_el.find(':input.value').datepicker('destroy');
+          }
+          this.value = val;
+        },
+        updateAttribute: function(attribute, value) {
+          switch(attribute) {
+            case 'column-name':
+              this.column_name = value;
+              this.filter = '';
+              this.value = '';
               break;
             case 'filter':
-              return value
+              this.filter = value;
               break;
             case 'value':
-              return value
+              this.value = value;
               break;
           }
+          $('#filterModal #modal-body').trigger('render');
         },
-
-        clearErrors: function() {
-          $('#add_filter_form td').removeClass('has-error');
-        },
-
-        renderFilters: function() {
-          $('tr.filter_data').remove();
-          FORMBUILDER.filters.forEach(function(el, i) {
-            var item = document.createElement("tr");
-            item.className = "filter_data";    
-            item.setAttribute('data-index', i)
-            $(item)
-            .append(
-              $("<td class='column_name'>")
-              .append(
-                el.column_name
-              )
-            )
-            .append(
-              $("<td class='filter'>")
-              .append(
-                el.filter
-              )
-            )
-            .append(
-              $("<td class='value'>")
-              .append(
-                el.value
-              )
-            )
-            .append(
-              $("<td span='10%' class='text-center'>")
-              .append(
-                $('<a href="#" class="remove-filter"><i class="fa fa-trash"></i></a>')
-              )
-            )
-            $('.column-filters').prepend(item)
-          })
-          $('.remove-filter').click(function(e){
-            e.stopPropagation();
-            e.preventDefault();
-            FORMBUILDER.actions.removeFilter(e);
-          })
-        },
-
-        resetForm: function() {
-          $('#add_filter_form :input').val('').trigger('change');
-          FORMBUILDER.actions.updateCurrentFilter();
-        },
-
-        updateCurrentFilter: function() {
-          var filter = FORMBUILDER.current_filter;
-          filter.column_name = $('#add_filter_form :input#column_name').val();
-          filter.filter = $('#add_filter_form :input#filter').val();
-          filter.value = $('#add_filter_form :input#value').val();
-        },
-
-        setValueFieldType: function() {
-          if (FORMBUILDER.current_filter['column_name'] == 'submitted_at') {
-            $('#add_filter_form :input#value').datepicker();
-          } else {
-            $('#add_filter_form :input#value').datepicker('destroy');
-          }
+        toJson: function() {
+          var json = {};
+          json.column_name = this.column_name;
+          json.filter = this.filter;
+          json.value = this.value;
+          return json;
         }
+      };
 
+      var filter_group_root = new FilterGroupRoot();
+
+      buildTree = function(json, parent) {
+        if (json.column_name) {
+          var filter = new Filter(parent, json.column_name, json.filter, json.value)
+          parent.children.push(filter);
+        } else {
+          if (parent) {
+            var filter_group = new FilterGroup(parent, json.condition)
+            parent.children.push(filter_group)            
+            $.each(json.children, function (index, value) {
+              buildTree(value, filter_group)
+            })
+          } else {
+            filter_group_root = new FilterGroupRoot();
+            $.each(json.children, function (index, value) {
+              buildTree(value, filter_group_root)
+            })
+          }
+        } 
       }
 
-      $('.add-filter').click(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        FORMBUILDER.actions.addFilter();
+      $('#filterModal #modal-body').on('render', function() {
+        $('#filterModal #modal-body').html(filter_group_root.render());
       })
-
-      $('#add_filter_form :input').change(function(){
-        FORMBUILDER.actions.updateCurrentFilter();
-      })
-
-      $("#add_filter_form :input#column_name").on('change', function(e){
-        var column_name = $("#add_filter_form :input#column_name").val();
-        var $el = $(":input#filter");
-        $el.empty();
-        $el.append($("<option value></option>"));
-        var filters = FORMBUILDER.possible_column_filters[column_name]
-        $.each(filters, function(index,value) {
-          $el.append($("<option></option>")
-             .attr("value", value).text(value));
-        });
-        $("#add_filter_form :input#value").val('');
-        FORMBUILDER.actions.setValueFieldType();
-      });
 
       $('button#update_filters').click(function(){
-        common_filters = JSON.parse(JSON.stringify(FORMBUILDER.filters));
+        common_filters = filter_group_root.toJson();
         $('#orders-table').trigger('filters-update')
         $('#filterModal').modal("toggle")
       })
 
       $('button#cancel_filters').click(function(){
-        FORMBUILDER.filters = JSON.parse(JSON.stringify(common_filters));
-        FORMBUILDER.actions.renderFilters();
+        buildTree(common_filters);
+        $('#filterModal #modal-body').trigger('render');
         $('#filterModal').modal("toggle")
       })
 
       $('#orders-table').on('filters-restore', function() {
-        FORMBUILDER.filters = JSON.parse(JSON.stringify(common_filters));
-        FORMBUILDER.actions.renderFilters();
+        buildTree(common_filters);
+        $('#filterModal #modal-body').trigger('render');
       })
     });
     orders_table = $('#orders-table').dataTable({
