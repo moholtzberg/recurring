@@ -16,9 +16,9 @@ module DataImports
     #   puts "********** End of Importing the items *********"
     # end
     #
-    def perform(file_path)
+    def perform(file_path, from, to)
       spreadsheet = CSV.read(file_path || file.path, :headers => true, :encoding => 'ISO-8859-1')
-      spreadsheet.map do |row|
+      spreadsheet[from..to].map do |row|
         DataImports::ImportItemRowWorker.perform_async(row.to_hash)
       end
     end
