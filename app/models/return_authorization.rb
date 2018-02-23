@@ -62,7 +62,7 @@ class ReturnAuthorization < ActiveRecord::Base
   end
 
   def order_is_complete
-    return true if order.state == 'completed'
+    return true if order.state.in? ['awaiting_fulfillment','fulfilled','completed']
     errors.add(:order_id, 'Order should be completed before returning.')
   end
 
