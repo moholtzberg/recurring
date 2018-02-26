@@ -68,7 +68,7 @@ class Payment < ActiveRecord::Base
 
   def not_over_applying
     applied = order_payment_applications.inject(0.0) do |sum, opa|
-      sum + opa.applied_amount
+      sum + opa.applied_amount.to_s.to_d
     end
     return if amount.to_d >= applied.to_d
     errors.add(:amount, "Can't over apply payment, #{applied}"\

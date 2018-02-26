@@ -49,7 +49,7 @@ class Account < ActiveRecord::Base
   end
 
   def has_enough_credit
-    !credit_terms.nil? and credit_limit.to_d >= (orders.map(&:balance_due).sum).to_d
+    has_credit and credit_limit.to_d >= (orders.map(&:balance_due).sum).to_d
   end
   
   def payment_terms

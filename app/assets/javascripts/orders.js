@@ -128,11 +128,7 @@ $(document).on('turbolinks:load', function() {
       Filter.prototype = {
         render: function() {
           var self = this;
-          var template = '<div class="panel panel-default"> \
-                            <div class="panel-heading"> \
-                              <button class="btn btn-default remove-filter">Remove</button> \
-                            </div> \
-                            <div class="panel-body"> \
+          var template = '<div class="form-inline"> \
                               <select class="column-name" class="form-control"> \
                                 <option value></option> \
                                 <option value="number">Number</option> \
@@ -144,7 +140,7 @@ $(document).on('turbolinks:load', function() {
                               <select class="filter"> \
                               </select> \
                               <input class="value"/> \
-                            </div> \
+                              <button class="btn btn-primary btn-sm remove-filter">Remove</button>\
                           </div>'
           var $item = $(jQuery.parseHTML(template)[0])
           $item.find('.remove-filter').click(function() {
@@ -286,10 +282,10 @@ $(document).on('turbolinks:load', function() {
         {"data": "account", className: "all"},
         {"data": "total", sortable: false, className: "all"},
         {"data": "sub_total", className: "all"},
-        {"data": "shipped", sortable: false, className: "min-desktop"},
-        {"data": "fulfilled", sortable: false, className: "min-desktop"},
-        {"data": "balance_due", sortable: false, className: "min-desktop"},
-        {"data": "submitted_at", className: "min-desktop"},
+        {"data": "shipped", sortable: false, className: "all"},
+        {"data": "fulfilled", sortable: false, className: "all"},
+        {"data": "balance_due", sortable: false, className: "all"},
+        {"data": "submitted_at", className: "all"},
         {"data": "state", className: "all"},
         {"data": "dropdown", sortable: false, className: "all"}
       ]

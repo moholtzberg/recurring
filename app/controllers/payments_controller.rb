@@ -18,6 +18,18 @@ class PaymentsController < ApplicationController
   end
 
   def create
+    puts payment_params.inspect
+    payment_params[:order_payment_applications_attributes].each do |appl|
+      puts "1. #{appl}"
+      puts "2. #{appl.inspect}"
+      puts "3. #{appl[1]['applied_amount']}"
+      if appl[1]['applied_amount'] == (nil || 0)
+        puts "Were Here"
+        payment_params[:order_payment_applications_attributes].delete(:appl)
+      end
+    end
+    
+    puts payment_params.inspect
     @payment = Payment.new(payment_params)
     @payment.save if @payment.valid? && @payment.authorize
     update_index
@@ -45,6 +57,10 @@ class PaymentsController < ApplicationController
     @payments = Payment.includes(:account)
                        .order(sort_column + ' ' + sort_direction)
                        .includes(:order_payment_applications => [:order])
+                       #.joins("LEFT OUTER JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                       #.group("payments.id, payment_methods.name")
+                       #.having("payment_methods.name != 'terms'")
+                       
     @payments = @payments.lookup(params[:term]) if params[:term].present?
     @payments = @payments.paginate(:page => params[:page], :per_page => 25)
   end

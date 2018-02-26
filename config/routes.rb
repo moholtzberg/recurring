@@ -169,6 +169,7 @@ Rails.application.routes.draw do
           get :item_usage_by_group
           get :ar_aging
           get :vendor_prices
+          get :unlinked_order_line_items
         end
       end
       resources :return_authorizations, except: [:edit, :update] do

@@ -5,6 +5,7 @@ $(document).on('turbolinks:load', function() {
       "processing": true,
       "serverSide": true,
       "responsive": true,
+      "stateSave": true,
       "sServerMethod": 'POST',
       "ajax": $('#purchase-orders-table').data('source'),
       "pagingType": "full_numbers",

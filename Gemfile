@@ -52,7 +52,7 @@ gem 'newrelic_rpm'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
 
-gem 'sidekiq', '~> 4.1', '>= 4.1.1'
+gem 'sidekiq', '4.2.7'
 gem 'sinatra', :require => nil
 gem 'sidekiq-scheduler'
 gem 'sidekiq-batch'
@@ -65,13 +65,13 @@ group :development, :test do
   gem 'mina'
   gem 'mina-foreman', github: 'asabourin/mina-foreman', branch: 'master'
   gem 'byebug'
-  # gem 'jazz_hands', github: 'nixme/jazz_hands', branch: 'bring-your-own-debugger'
   gem 'pry-byebug'
   gem 'web-console', '~> 2.0'
+  gem "bullet"
+  gem 'quiet_assets', '~> 1.1'
+  gem "letter_opener"
 end
-gem "bullet", :group => "development"
-gem 'quiet_assets', '~> 1.1', group: :development
-gem "letter_opener", :group => :development
+
 gem 'raindrops', '~> 0.15.0'
 gem 'state_machines'
 gem 'state_machines-activerecord'
@@ -85,3 +85,4 @@ gem 'friendly_id', '~> 5.1.0'
 gem 'summernote-rails'
 gem 'bootstrap-datepicker-rails'
 gem 'paper_trail'
+gem 'lograge'

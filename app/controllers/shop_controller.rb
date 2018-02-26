@@ -271,8 +271,6 @@ class ShopController < ApplicationController
       @cart = Cart.find_or_initialize_by(:id => nil)
     end
     cookies.permanent.signed[:cart_id] = @cart.id
-    
-    puts "CCAARRTT -> #{@cart.number}"
   end
   
 end

@@ -42,7 +42,7 @@ class Order < ActiveRecord::Base
   has_many :return_authorizations
   has_many :order_line_items, :dependent => :destroy, :inverse_of => :order
   has_many :items, :through => :order_line_items
-  has_many :shipments, :through => :order_line_items
+  has_many :shipments
   has_many :order_payment_applications
   has_many :payments, :through => :order_payment_applications
   has_many :credit_card_payments, :through => :order_payment_applications
@@ -129,7 +129,9 @@ class Order < ActiveRecord::Base
   end
 
   def terms_payment?
-    payments.map {|p| p.payment_method.name }.uniq == ['terms'] and account.has_enough_credit
+    # payments.map {|p| p.payment_method.name }.uniq == ['terms'] and account.has_enough_credit
+    # payments.nil? and account.has_enough_credit
+    terms == "terms"
   end
 
   def account_name
@@ -166,8 +168,6 @@ class Order < ActiveRecord::Base
     order_shipping_method.amount = name if name.present?
     order_shipping_method.save
   end
-  
-  ######
   
   def update_order_tax_rate
     if is_taxable?
@@ -227,8 +227,6 @@ class Order < ActiveRecord::Base
     end
   end
   
-  #####
-  
   def quantities_not_linked_to_po
     order_line_items.map(&:quantities_not_linked_to_po).sum.to_i
   end
@@ -243,18 +241,12 @@ class Order < ActiveRecord::Base
     # .includes(:order_line_items => [:purchase_order_line_items]).map {|a| if a.not_linked_to_po == true then a.id end}
     # where(id: ids)
     ids = Order
-    .joins(:order_line_items => [:purchase_order_line_items])
+    .joins("LEFT OUTER JOIN order_line_items ON order_line_items.order_id = orders.id")
+    .joins("LEFT OUTER JOIN purchase_order_line_items ON purchase_order_line_items.order_line_item_id = order_line_items.id")
     .group("orders.id")
-    .having("SUM(COALESCE(purchase_order_line_items.quantity,0)) = SUM(COALESCE(order_line_items.quantity,0) - COALESCE(order_line_items.quantity_canceled,0))").ids
+    .having("SUM(COALESCE(purchase_order_line_items.quantity,0)) >= SUM(COALESCE(order_line_items.quantity,0) - COALESCE(order_line_items.quantity_canceled,0))").ids
     where.not(id: ids).order("number")
   end
-  
-  # def self.lookup(q)
-  #   ids = Order
-  #   .joins({:account => [:group]}, {:order_line_items => [:item]})
-  #   .where("lower(orders.number) like (?) or lower(orders.po_number) like (?) or lower(items.number) like (?) or lower(items.name) like (?) or lower(items.description) like (?) or lower(groups.name) like (?)", "%#{q.downcase}%", "%#{q.downcase}%", "%#{q.downcase}%", "%#{q.downcase}%", "%#{q.downcase}%", "%#{q.downcase}%").ids
-  #   where(id: ids)
-  # end
   
   def flush_cache
     Rails.cache.delete([self.class.name,"open_orders"])
