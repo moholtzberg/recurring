@@ -13,6 +13,7 @@
 		    	<option value="<%= ar_aging_reports_path %>">A/R Aging Report</option>
           <option value="<%= vendor_prices_reports_path %>">Vendor Prices</option>
 					<option value="<%= unlinked_order_line_items_reports_path %>">Unlinked Order Line Items</option>
+					<option value="<%= ordered_items_reports_path %>">Ordered Items</option>
 		    </select>
 		  </div>
 		  <div class="form-group">
@@ -89,7 +90,8 @@
 		  			"<%= item_usage_by_group_reports_path %>": {'from_date': true, 'to_date': true, 'group_id': true, 'account_ids': false},
 		  			"<%= ar_aging_reports_path %>": {'from_date': false, 'to_date': false, 'group_id': false, 'account_ids': false},
             "<%= vendor_prices_reports_path %>": {'from_date': false, 'to_date': false, 'group_id': false, 'account_ids': false},
-						"<%= unlinked_order_line_items_reports_path %>": {'from_date': false, 'to_date': false, 'group_id': false, 'account_ids': false}            
+						"<%= unlinked_order_line_items_reports_path %>": {'from_date': false, 'to_date': false, 'group_id': false, 'account_ids': false},
+						"<%= ordered_items_reports_path %>": {'from_date': false, 'to_date': false, 'group_id': false, 'account_ids': false}            
 		  		}
 		  		$('#report_type').change(function() {
 		  			var path = $(this).val();

@@ -126,7 +126,15 @@ class ReportsController < ApplicationController
       format.xls
     end
   end
-
+  
+  def ordered_items
+    respond_to do |format|
+      format.html 
+      format.js
+      format.xls
+    end
+  end
+  
   def send_report
     ReportMailer.send("#{params[:action]}_report",
                       current_user.email,
