@@ -120,10 +120,12 @@ class CheckoutController < ApplicationController
         })
       end
       @payment.credit_card_id = @card&.id
+      @checkout.terms = "Credit Card"
     else
       @payment.payment_type =  'CheckPayment'
       @payment.amount = 0
       @payment = @payment.becomes CheckPayment
+      @checkout.terms = params[:payment_method] == "terms" ? "Net #{@checkout.account.credit_terms}" : "Check"
     end
     @cards = current_user.account.main_service.credit_cards
     if (@payment.payment_type == 'CheckPayment' or (@card and @card.errors.empty?)) and @payment.authorize
@@ -154,7 +156,7 @@ class CheckoutController < ApplicationController
     c = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
     c.email             = current_user.email if c.email.nil?
     c.user_id           = current_user.id if c.user_id.nil?
-    if c.account.present? and c.account.credit_hold == false
+    if c.account.present? and c.account.credit_hold == false and c.account.has_enough_credit
       c.credit_hold = false
     else
       c.credit_hold = true
@@ -189,6 +191,10 @@ class CheckoutController < ApplicationController
   
   def shipping_params
     params.require(:order_shipping_method).permit(:shipping_method_id)
+  end
+  
+  def address_params
+    params.require(:address).permit(:name, :account_id, :address_1, :address_2, :city, :state, :zip, :phone)
   end
   
   def checkout_params

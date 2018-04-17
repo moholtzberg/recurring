@@ -41,7 +41,7 @@ class Account < ActiveRecord::Base
   end
   
   def has_credit
-    if credit_limit > 0 and credit_hold != true and credit_terms > 1
+    if credit_limit > 0 and credit_hold != true and payment_terms > 1
       true
     else
       false
@@ -53,7 +53,7 @@ class Account < ActiveRecord::Base
   end
   
   def payment_terms
-    credit_terms
+    credit_terms.to_i
   end
   
   def is_taxable?

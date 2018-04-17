@@ -38,7 +38,7 @@
     <% end %>
     <% if @order.credit_hold? %>
 	  	<div class="btn-group" role="group">
-      	<%= link_to("Remove Credit Hold", credit_hold_remove_order_path(@order.id), :method => "put", :class => 'btn btn-primary')  %>
+      	<%= link_to("Remove Credit Hold", remove_hold_order_path(@order.id), :method => "put", :class => 'btn btn-primary')  %>
       </div>
     <% end %>
     <% if @order.awaiting_shipment? or @order.partially_shipped? %>

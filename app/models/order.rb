@@ -13,6 +13,7 @@ class Order < ActiveRecord::Base
   scope :has_account, -> () { where.not(:account_id => nil) }
   scope :no_account, -> () { where(:account_id => nil) }
   scope :by_date_range, -> (from, to) { where("due_date >= ? AND due_date <= ?", from, to) }
+  scope :by_date_range_submitted_at, -> (from, to) { where("submitted_at >= ? AND submitted_at'[] <= ?", from, to) }
   scope :lookup, lambda { |q|
     includes(
       :account => [:group],
@@ -43,7 +44,7 @@ class Order < ActiveRecord::Base
   has_many :order_line_items, :dependent => :destroy, :inverse_of => :order
   has_many :items, :through => :order_line_items
   has_many :shipments
-  has_many :order_payment_applications
+  has_many :order_payment_applications, :dependent => :destroy, :inverse_of => :order
   has_many :payments, :through => :order_payment_applications
   has_many :credit_card_payments, :through => :order_payment_applications
   has_many :purchase_order_line_items, :through => :order_line_items
@@ -54,7 +55,7 @@ class Order < ActiveRecord::Base
   before_save :make_record_number
   
   after_commit :flush_cache
-  after_update :update_order_tax_rate
+  after_update :update_order_tax_rate, :unless => :state_is_not_fulfilled?
   after_commit :update_totals, :if => :persisted?
   
   # after_commit :sync_with_quickbooks if :persisted
@@ -71,7 +72,7 @@ class Order < ActiveRecord::Base
     end
 
     before_transition on: :remove_hold do |order|
-      order.credit_hold = false
+      order.update_attribute(:credit_hold, false)
     end
 
     before_transition any => :awaiting_payment do |order|
@@ -95,17 +96,19 @@ class Order < ActiveRecord::Base
     end
 
     event :cancel do
-      transition [:incomplete, :pending] => :canceled
+      transition [:incomplete, :pending, :credit_hold] => :canceled
+      transition [:awaiting_payment, :awaiting_shipment] => :canceled, if: -> (order) { order.quantity_shipped == 0 and order.quantity_fulfilled == 0 }
     end
 
     event :approve do
-      transition :pending => :credit_hold, if: -> (order) { order.terms_payment? and order.credit_hold? }
+      transition :pending => :credit_hold, if: -> (order) { order.credit_hold == true or order.account.has_enough_credit == false}
       transition :pending => :awaiting_shipment, if: -> (order) { order.terms_payment? or order.paid }
       transition :pending => :awaiting_payment
     end
 
     event :remove_hold do
-      transition :credit_hold => :awaiting_shipment, if: -> (order) { order.terms_payment? }
+      transition :credit_hold => :awaiting_shipment, if: -> (order) { order.terms_payment? or order.paid }
+      transition :credit_hold => :awaiting_payment
     end
 
     event :confirm_payment do
@@ -133,7 +136,12 @@ class Order < ActiveRecord::Base
     # payments.nil? and account.has_enough_credit
     terms == "terms"
   end
-
+  
+  def state_is_not_fulfilled?
+    puts "State is #{state} and should return #{state.in?(["fulfilled", "completd"])}"
+    return !state.in?(["fulfilled", "completd"])
+  end
+  
   def account_name
     account.try(:name)
   end
@@ -552,7 +560,7 @@ class Order < ActiveRecord::Base
   end
 
   def create_full_invoice
-    invoice = Invoice.new(date: Date.today, order_id: id, due_date: Date.today)
+    invoice = Invoice.new(date: submitted_at, order_id: id, due_date: submitted_at + account&.credit_terms&.to_i&.days)
     invoice.order_line_items = order_line_items
     invoice.line_item_fulfillments.each do |lif|
       lif.quantity_fulfilled = lif.order_line_item.actual_quantity

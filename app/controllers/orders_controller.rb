@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   layout 'admin'
   before_action :set_order, only:
     %i[show invoice resend_order resend_invoice edit update destroy
-       lock approve submit cancel credit_hold credit_hold_remove expand]
+       lock approve submit cancel credit_hold remove_hold expand]
 
   def datatables
     authorize! :read, Order
@@ -160,10 +160,9 @@ class OrdersController < ApplicationController
     end
   end
   
-  def credit_hold_remove
+  def remove_hold
     authorize! :update, Order
-    @order.credit_hold = false
-    @order.save
+    @order.remove_hold
     respond_to do |format|
       format.html { redirect_to action: 'edit', id: @order.id }
       format.js { render :update }
@@ -207,6 +206,7 @@ class OrdersController < ApplicationController
   end
 
   def set_order
-    @order = Order.find(params[:id])
+    @order = Order.find_by(number: params[:id])
+    @order ||= Order.find_by(id: params[:id])
   end
 end

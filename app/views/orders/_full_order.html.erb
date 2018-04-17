@@ -117,7 +117,7 @@
     <td colspan="3" class="text-center"><strong> <%= number_to_currency(order.order_shipping_method.amount) unless  order.order_shipping_method.nil? %></strong></td>
   </tr>
   <tr class="line_items">
-    <td colspan="7"><%= "#{order.order_tax_rate.name}" unless  order.order_tax_rate.nil? %>Tax</td>
+    <td colspan="7"><%= "#{order.order_tax_rate.name} " unless  order.order_tax_rate.nil? %>Tax</td>
     <td colspan="3" class="text-center"><strong> <%= number_to_currency(order.tax_total)%></strong></td>
   </tr>
   <tr class="line_items">
