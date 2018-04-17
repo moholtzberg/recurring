@@ -6,7 +6,10 @@ module Api
     skip_before_filter :check_authorization, only: :webhook
 
     def webhook
-      @email_delivery = EmailDelivery.find(message_headers['X-Mailgun-Variables'])
+      puts "**---------------------------------------------------------------**"
+      puts "**---- #{params.inspect} ---- **"
+      puts "**---------------------------------------------------------------**"
+      @email_delivery = EmailDelivery.find(params[:identifier])
       if EmailDeliveryServices::VerifyWebhook.new.call(params[:token], params[:timestamp], params[:signature])
         @code = @email_delivery.update_attribute(attribute, time_sent) ? 200 : 409
       else
