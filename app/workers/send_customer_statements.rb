@@ -6,7 +6,7 @@ class SendCustomerStatements
 
   def perform
     Customer.where(active: true).each do |customer|
-      if customer.outstansing_invoices > 0
+      if customer.outstanding_invoices > 0
         ScheduledTasks::SendCustomerStatmentByAccountId.perform_async(customer.id)
       end
     end

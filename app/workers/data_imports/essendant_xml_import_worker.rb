@@ -6,6 +6,7 @@ module DataImports
     sidekiq_options :backtrace => true
   
     def perform(id)
+      puts "-----> #{id}"
       item = Item.find_by(id: id)
       item.update_columns(:updated_at => Time.now)
       start = Time.now
@@ -14,12 +15,11 @@ module DataImports
   
       current_item_id = id
 
-      path = File.expand_path("#{SHARED_DIR}/ecdb.individual_items")
-  
+      path = File.expand_path("#{SHARED_DIR}/xml/individual_items/individual_items/ecdb.individual_items")
+      
       begin
         noko = File.open("/#{path}/#{item.number}.xml") { |f| Nokogiri::XML(f) }
       rescue
-    
         unless item.number.ends_with? "COMP"
           item.update_attributes(:active => false)
         end
@@ -91,7 +91,7 @@ module DataImports
         noko.xpath("//oa:Specification//oa:Property//oa:NameValue").each_with_index do |k,v, index|
           ItemProperty.create(:item_id => current_item_id, :key => k.attributes["name"], :value => k.text, :order => index, :active => true)
         end
-        add_log "matchbook starting"
+        
         noko.xpath("//us:Matchbook").each_with_index.map do |k, index|
           ItemProperty.create(:item_id => item.id, :key => k.attributes["name"], :value => k.text, :order => index, :active => true)
           rel_make    = noko.xpath("//us:Matchbook")[index].element_children[0].element_children[0].text
@@ -157,8 +157,6 @@ module DataImports
       
         name = noko.css("[type=Long_Item_Description]").text
         description = noko.css("[type=Item_Consolidated_Copy]").text
-   
-        item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price)
         
         sku_group_name = noko.at('[name="SKU_Group_Name"]')&.text
         sku_group_image_name = noko.at('//us:SkuGroupImage')&.text
@@ -174,8 +172,10 @@ module DataImports
             sku_img.set_attachment_from_oppictures
           end
         end
-
-        Price.create(item_id: item.id, combinable: true, price: list_price, _type: 'Default')
+        
+        item.update_attributes(:brand_id => brand, :slug => item.number.downcase, :height => height, :width => width, :length => length, :weight => weight, :name => name, :description => description, :active => active, :assembly_code => assembly_code, :non_returnable_code => non_returnable_code, :green_indicator => green_indicator, :recycle_indicator => recycle_indicator, :small_package_indicator => small_package_indicator, :list_price => list_price, sku_group_id: sku_group.id)
+        
+        Price.create(item_id: item.id, combinable: true, price: list_price, _type: 'Default') if item.default_price&.price.nil?
 
         Image.delete_all(:attachable_id => item.id, :attachable_type => 'Item')
 
