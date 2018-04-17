@@ -82,8 +82,8 @@ class ItemsController < ApplicationController
   private
 
   def set_item
-    @item = Item.find_by(id: params[:id])
-    @item ||= Item.find_by(number: params[:id])
+    @item = Item.find_by(number: params[:id])
+    @item ||= Item.find_by(id: params[:id])
   end
 
   def item_params
