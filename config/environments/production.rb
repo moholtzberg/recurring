@@ -83,10 +83,11 @@ Rails.application.configure do
     :storage => :s3,
     :preserve_files => true,
     :s3_credentials => {
-      :bucket => "247officesuppy",
+      :bucket => "#{SECRET['AWS']['S3']['BUCKET_NAME']}",
       :access_key_id => "#{SECRET['AWS']['ACCESS_KEY_ID']}",
       :secret_access_key => "#{SECRET['AWS']['SECRET_ACCESS_KEY']}"
-    }
+    },
+    :s3_region => "us-east-1"
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
