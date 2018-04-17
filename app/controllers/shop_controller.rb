@@ -13,7 +13,7 @@ class ShopController < ApplicationController
   
   def index
     @categories = Category.is_parent.is_active
-    @items = Item.all
+    @items = Item.all.includes(:images, :prices)
   end
   
   def categories
