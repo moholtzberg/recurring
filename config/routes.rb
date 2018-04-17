@@ -131,6 +131,7 @@ Rails.application.routes.draw do
           put :resend_order
           post :resend_order_confirmation
           put :credit_hold
+          put :remove_hold
           post :apply_code
         end
         resources :shipments, :only => [:new, :create]
@@ -170,6 +171,7 @@ Rails.application.routes.draw do
           get :ar_aging
           get :vendor_prices
           get :unlinked_order_line_items
+          get :ordered_items
         end
       end
       resources :return_authorizations, except: [:edit, :update] do
@@ -238,7 +240,8 @@ Rails.application.routes.draw do
     resources :orders, param: :order_number, only: [:show, :return]
     resources :return_authorizations, only: [:new, :create]
   end
-
+  
+  get   "pub_dir", :to => redirect("/")
   get   "checkout/address" => "checkout#address"
   patch "checkout/address" => "checkout#update_address"
   get   "checkout/shipping" => "checkout#shipping"
@@ -249,7 +252,19 @@ Rails.application.routes.draw do
   patch "checkout/submit"=> "checkout#submit"
   post  "checkout/apply_code" => "checkout#apply_code"
   delete  "checkout/remove_code" => "checkout#remove_code"
-
+  get "checkout/fast" => "checkout#fast_checkout"
+  get "checkout/fast/choose_address" => "checkout#fast_choose_address"
+  get "checkout/fast/new_address" => "checkout#fast_new_address"
+  patch "checkout/fast/update_address" => "checkout#fast_update_address"
+  get "checkout/fast/update_address" => "checkout#fast_update_address"
+  patch "checkout/fast/create_address" => "checkout#fast_create_address"
+  get "checkout/fast/back_to_address" => "checkout#fast_back_to_address"
+  get "checkout/fast/choose_payment_method" => "checkout#fast_choose_payment_method"
+  get "checkout/fast/new_cc" => "checkout#fast_new_cc"
+  post "checkout/fast/create_cc" => "checkout#fast_create_cc"
+  patch "checkout/fast/update_payment_method" => "checkout#fast_update_payment_method_path"
+  get "checkout/fast/back_to_payment" => "checkout#fast_back_to_payment"
+  
   post  "/add_to_cart" => "shop#add_to_cart"
   patch "/add_to_cart" => "shop#add_to_cart"
   post  "/update_cart" => "shop#update_cart"

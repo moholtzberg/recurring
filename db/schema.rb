@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180221201704) do
+ActiveRecord::Schema.define(version: 20180326154159) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -81,6 +81,11 @@ ActiveRecord::Schema.define(version: 20180221201704) do
     t.integer  "attachable_id"
     t.string   "attachable_type"
   end
+
+  add_index "assets", ["attachable_id"], name: "index_assets_on_attachable_id", using: :btree
+  add_index "assets", ["attachable_type"], name: "index_assets_on_attachable_type", using: :btree
+  add_index "assets", ["id"], name: "index_assets_on_id", using: :btree
+  add_index "assets", ["type"], name: "index_assets_on_type", using: :btree
 
   create_table "bins", force: :cascade do |t|
     t.string  "name"
@@ -339,6 +344,12 @@ ActiveRecord::Schema.define(version: 20180221201704) do
     t.string  "type",    default: "Specification"
   end
 
+  add_index "item_properties", ["id"], name: "item_properties_id_ix", using: :btree
+  add_index "item_properties", ["item_id"], name: "item_properties_item_id_ix", using: :btree
+  add_index "item_properties", ["key"], name: "index_item_properties_on_key", using: :btree
+  add_index "item_properties", ["type"], name: "index_item_properties_on_type", using: :btree
+  add_index "item_properties", ["value"], name: "index_item_properties_on_value", using: :btree
+
   create_table "item_references", force: :cascade do |t|
     t.integer  "original_item_id"
     t.integer  "replacement_item_id"
@@ -397,6 +408,9 @@ ActiveRecord::Schema.define(version: 20180221201704) do
   end
 
   add_index "items", ["id"], name: "item_id_ix", using: :btree
+  add_index "items", ["number"], name: "index_items_on_number", using: :btree
+  add_index "items", ["sku_group_id"], name: "index_items_on_sku_group_id", using: :btree
+  add_index "items", ["slug"], name: "index_items_on_slug", using: :btree
 
   create_table "jobs", force: :cascade do |t|
     t.string   "job_name"
@@ -638,6 +652,14 @@ ActiveRecord::Schema.define(version: 20180221201704) do
     t.string   "appliable_type"
     t.decimal  "price",          precision: 10, scale: 2
   end
+
+  add_index "prices", ["_type"], name: "index_prices_on__type", using: :btree
+  add_index "prices", ["appliable_id"], name: "index_prices_on_appliable_id", using: :btree
+  add_index "prices", ["appliable_type"], name: "index_prices_on_appliable_type", using: :btree
+  add_index "prices", ["end_date"], name: "index_prices_on_end_date", using: :btree
+  add_index "prices", ["id"], name: "prices_id_ix", using: :btree
+  add_index "prices", ["item_id"], name: "index_prices_on_item_id", using: :btree
+  add_index "prices", ["start_date"], name: "index_prices_on_start_date", using: :btree
 
   create_table "purchase_order_line_item_receipts", force: :cascade do |t|
     t.integer  "purchase_order_line_item_id"
