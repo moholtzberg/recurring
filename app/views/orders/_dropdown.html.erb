@@ -37,8 +37,8 @@
       <li><%= link_to("Resend Invoice Notification", resend_invoice_order_path(:id => item.id), :remote => true, :method => "put") %></li>
     <% end %>
 		<li class="divider"></li>
-		<% item.state_paths.events.each do |state| %>
+		<%# item.state_paths.events.each do |state| %>
 			<%# link_to(state.to_s, polymorphic_url(item, action: state), :remote => true, :method => "put")%>
-		<% end %>
+		<%# end %>
   </ul>
 </div>
