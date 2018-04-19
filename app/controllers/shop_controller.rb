@@ -153,6 +153,22 @@ class ShopController < ApplicationController
     end
   end
   
+  def quick_order
+    flash[:error] = nil
+  end
+  
+  def quick_search
+    item_id = Item.find_by(number: params[:search][:item_number])&.id
+    @item_ids = []
+    #@item_ids.push(params[:search][:item_ids].split(" "))
+    @item_ids.push(item_id).flatten
+    @items = Item.where(id: @item_ids)
+    if item_id.nil?
+      flash[:error] = "We were not able to find an item with the number <i><em>\"".html_safe + "#{params[:search][:item_number]}" + "\"</em></i>".html_safe
+      puts "error"
+    end
+  end
+  
   def cart
     @cart = Cart.find_or_initialize_by(:id => cookies.permanent.signed[:cart_id])
     if current_user && current_user.has_account

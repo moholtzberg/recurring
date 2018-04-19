@@ -174,7 +174,6 @@ class Item < ActiveRecord::Base
 
   def default_image_path
     unless images.first.nil?
-      puts "----> #{images.first.path}"
       images.first.attachment.url
     end
   end

@@ -241,7 +241,6 @@ Rails.application.routes.draw do
     resources :return_authorizations, only: [:new, :create]
   end
   
-  get   "pub_dir", :to => redirect("/")
   get   "checkout/address" => "checkout#address"
   patch "checkout/address" => "checkout#update_address"
   get   "checkout/shipping" => "checkout#shipping"
@@ -265,6 +264,8 @@ Rails.application.routes.draw do
   patch "checkout/fast/update_payment_method" => "checkout#fast_update_payment_method_path"
   get "checkout/fast/back_to_payment" => "checkout#fast_back_to_payment"
   
+  get   "/quick_order" => "shop#quick_order", as: :quick_order
+  get   "/quick_search" => "shop#quick_search", as: :quick_search
   post  "/add_to_cart" => "shop#add_to_cart"
   patch "/add_to_cart" => "shop#add_to_cart"
   post  "/update_cart" => "shop#update_cart"
