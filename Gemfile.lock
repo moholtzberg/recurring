@@ -634,6 +634,8 @@ GEM
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     crass (1.0.3)
+    css_parser (1.6.0)
+      addressable
     dalli (2.7.6)
     debug_inspector (0.0.3)
     devise (4.3.0)
@@ -662,6 +664,7 @@ GEM
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     highline (1.7.10)
+    htmlentities (4.3.4)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.9.1)
@@ -746,6 +749,13 @@ GEM
       mimemagic (~> 0.3.0)
     pg (0.21.0)
     pr_geohash (1.0.0)
+    premailer (1.11.1)
+      addressable
+      css_parser (>= 1.6.0)
+      htmlentities (>= 4.0.0)
+    premailer-rails (1.10.2)
+      actionmailer (>= 3, < 6)
+      premailer (~> 1.7, >= 1.7.9)
     progress_bar (1.1.0)
       highline (~> 1.6)
       options (~> 2.3.0)
@@ -765,6 +775,8 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.8)
+    rack-attack (5.2.0)
+      rack
     rack-mini-profiler (0.10.7)
       rack (>= 1.2.0)
     rack-protection (1.5.4)
@@ -955,10 +967,12 @@ DEPENDENCIES
   paper_trail
   paperclip
   pg
+  premailer-rails
   progress_bar
   pry-byebug
   qbo_api
   quiet_assets (~> 1.1)
+  rack-attack
   rack-mini-profiler
   rails (~> 4.2.7.1)
   raindrops (~> 0.15.0)

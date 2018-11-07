@@ -21,6 +21,7 @@ class CheckPayment < Payment
   end
 
   def refund(sum)
+    puts "reeeeeefunuuuuuund #{sum}"
     update_attributes(refunded: sum)
   end
 

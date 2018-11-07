@@ -12,6 +12,8 @@
       <th>QTY Ordered</th>
       <th>Item Number</th>
       <th>Item Name</th>
+			<th>Price</th>
+			<th>Default Price</th>
     </tr>
 
     <% OrderLineItem.from_to_by_account_id(@from_date, @to_date, account.id).includes(:item => [ :default_price]).select { |li| li.qty > 0 }.each_with_index do |li, i|%>
@@ -21,6 +23,8 @@
         <td><%= number_with_delimiter(li.qty) %></td>
         <td><%= li.number %></td>
         <td><%= li.item.name %></td>
+				<td><%= number_to_currency(li.item.prices.where(appliable_type: "Group", appliable_id: @group.id).order(:id).last&.price) %></td>
+				<td><%= number_to_currency(li.item.default_price&.price)%>
       </tr>
     <% end %>
   </table>

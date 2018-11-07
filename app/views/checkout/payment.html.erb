@@ -29,9 +29,14 @@
 		<td colspan="2" class="text-center"><strong><%= number_to_currency(@cart.tax_total) %></strong></td>
 	</tr>
 	<tr>
-		<td colspan="3"><%= @checkout.order_shipping_method.name %> - Shipping</td>
+		<td colspan="3"><%= @checkout&.order_shipping_method&.name %> - Shipping</td>
 		<td colspan="2" class="text-center"><strong> <%= number_to_currency(@checkout.shipping_total) %></strong></td>
 	</tr>
+	
+	<% if @cart.discount_code&.code.present? and (@cart.discount_code&.discount_code_rules&.map { |r| r.check(@cart) })&.pop %>
+		<%= render :partial => "discount_code", locals: {checkout: @cart} %>
+	<% end %>
+	
 	<tr id="order_total">
 		<td colspan="3">Order Total</td>
 		<td colspan="2" class="text-center"><strong> <%= number_to_currency(@checkout.total) %></strong></td>
@@ -76,10 +81,12 @@
 	</tr>
 </table>
 
-<% if @cart.order_discount_code.nil? %>
+<% unless !@cart.discount_code&.code.present? and (@cart.discount_code&.rules&.map { |r| r.check(@cart) })&.pop %>
 	<%= render :partial => "order_discount_code_form" %>
 <% end %>
 
+<%= @checkout.number %>
+<%= @checkout.id %>
 <table class="table table-bordered">
 	<% if @checkout && @checkout.errors.any? %>
 		<div id="checkout_errors" class="alert alert-warning">

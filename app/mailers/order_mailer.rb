@@ -20,7 +20,7 @@ class OrderMailer < ApplicationMailer
     @email_delivery = EmailDelivery.create({
       addressable_type: 'User',
       addressable_id: @order.user_id,
-      to_email: @order.email,
+      to_email: email[:to].to_s,
       body: email[:text].to_s,
       eventable_type: 'Order',
       eventable_id: @order.id
@@ -36,8 +36,8 @@ class OrderMailer < ApplicationMailer
     
     defaults = {
       :from => "24\/7 Office Supply <orders@247officesupply.com>",
-      :to => @order.email,
-      :cc => bill_to_address
+      :to => bill_to_address,
+      :cc => @order.email
     }
     options = defaults.merge(options)
     
@@ -57,11 +57,12 @@ class OrderMailer < ApplicationMailer
     @email_delivery = EmailDelivery.create({
       addressable_type: 'User',
       addressable_id: @order.user_id,
-      to_email: @order.email,
+      to_email: email[:to].to_s,
       body: email[:text].to_s,
       eventable_type: 'Order',
       eventable_id: @order.id
     })
+    puts @email_delivery.inspect
     headers['X-Mailgun-Variables'] = @email_delivery.id
   end
 
@@ -85,11 +86,44 @@ class OrderMailer < ApplicationMailer
     @email_delivery = EmailDelivery.create({
       addressable_type: 'User',
       addressable_id: @order.user_id,
-      to_email: @order.email,
+      to_email: email[:to].to_s,
       body: email[:text].to_s,
       eventable_type: 'Order',
       eventable_id: @order.id
     })
     headers['X-Mailgun-Variables'] = @email_delivery.id
   end
+  
+  def approve_items_over_price_limit_notification(order_id, options = {})
+     
+    @order = Order.find_by(:id => order_id)
+    
+    
+    defaults = {
+      :from => "24\/7 Office Supply <orders@247officesupply.com>",
+      :to => @order.item_price_limit_approver.email,
+    }
+    options = defaults.merge(options)
+    
+    @order
+   
+    email = mail(
+         :to => options[:to],
+         :cc => options[:cc],
+         :bcc => options[:bcc],
+         :subject => "Approve Items Over Price Limit on #{@order.number}", 
+         :text => render_to_string("order_mailer/items_over_price_limit_notification").to_str
+    )
+    @email_delivery = EmailDelivery.create({
+      addressable_type: 'Order',
+      addressable_id: @order.item_price_limit_approver.id,
+      to_email: email[:to].to_s,
+      body: email[:text].to_s,
+      eventable_type: 'Order',
+      eventable_id: @order.id
+    })
+    puts @email_delivery.inspect
+    headers['X-Mailgun-Variables'] = @email_delivery.id
+  end
+  
 end

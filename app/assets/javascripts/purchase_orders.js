@@ -18,6 +18,7 @@ $(document).on('turbolinks:load', function() {
         {"data": "amount_received", sortable: false, className: "min-desktop"},
         {"data": "completed_at", className: "min-desktop"},
         {"data": "locked", className: "min-desktop"},
+				{"data": "state", className: "min-desktop"},
         {"data": "dropdown", sortable: false, className: "all"}
       ]
     });

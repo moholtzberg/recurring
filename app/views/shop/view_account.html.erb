@@ -1,8 +1,29 @@
 <% if params[:account_id] %>
 	
-	<% unless @account.nil? %>
-		<%= render :partial => "addresses", :locals => {:account => @account} %>
+	<div id="account_addresses">
+		<% unless @account.nil? %>
+			<%= render :partial => "addresses", :locals => {:account => @account} %>
+		<% end %>
+	</div>
+	
+	<div id="account_users">
+		<% unless @account&.users&.nil? %>
+			<%= render :partial => "users", :locals => {:account => @account}%>
+		<% end %>
+	</div>
+	
+	<table class="table table-bordered">
+		<tr>
+			<th colspan="3">Group Item Price Limit <small>(Items ordered which over the limit below will be held and the user will be notified below until approved)</small></th>
+		</tr>
+	<% AppliableItemPriceLimit.where(appliable_type: "Account", appliable_id: @account).each do |aipl| %>
+		<tr>
+			<td><%= number_to_currency(aipl.amount) %></td>
+			<td><%= aipl.approver.email %></td>
+			<td><%= "#{aipl.approver.first_name} #{aipl.approver.last_name}"%></td>
+		</tr>
 	<% end %>
+	</table>
 
 	<h3>Orders</h3>
 	<table class="table table-bordered">

@@ -5,7 +5,7 @@
 	<script>
 		$(function() {
 			$('#payment_payment_method_id').change(function() {
-				if ($('#payment_payment_method_id option:selected').text() == "credit_card") {
+				if ($('#payment_payment_method_id option:selected').text() == "Credit Card") {
 					$('#payment_credit_card_id').prop('disabled', false);
 					$('#payment_check_number').prop('disabled', true);
 					$('#payment_payment_type').val('CreditCardPayment')
@@ -20,7 +20,7 @@
 
 	<div id="payment_method" class="col-md-12">
 		<%= f.label :payment_method, :class => "control-label" %>
-		<%= f.select :payment_method_id, PaymentMethod.where(active: true).map{ |pm| [pm.name, pm.id] }, {}, {:class => "form-control", :disabled => !['new', 'create'].include?(params[:action]) }%>
+		<%= f.select :payment_method_id, PaymentMethod.where(active: true).order(:id).map{ |pm| [pm.name.gsub("_", " ").titleize, pm.id] }, {}, {:class => "form-control", :disabled => !['new', 'create'].include?(params[:action]) }%>
 	</div>
 	
 	<div id="account_name" class="col-md-12">

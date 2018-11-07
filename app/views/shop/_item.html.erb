@@ -25,9 +25,9 @@
 				<% end %>
 			</p>
 			<p>
-				<% unless i.brand.nil? %><span class="label label-warning"><%= i.brand.name %></span><% end %>
+				<%# unless i.brand.nil? %><span class="label label-warning"><%# i.brand.name %></span><%# end %>
 				<%# unless i.category.nil? %><span class="label label-info"><%# i.category.name %></span><%# end %>
-				<% i.item_categories.first(25).each do |cat| %>&nbsp;<span class="label label-info"><%= cat.category.name %></span><% end %>
+				<%# i.item_categories.first(25).each do |cat| %>&nbsp;<span class="label label-info"><%# cat.category.name %></span><%# end %>
 				<%# i.item_categories.inspect %>
 			</p>
 		</div>
@@ -63,7 +63,7 @@
 			<% if i.recurring_price %>
 				<%= link_to "Subscribe (#{number_to_currency(i.recurring_price.price)})", new_my_account_subscription_path(subscription: {item_id: i.id, account_id: current_user&.account_id, state: 'new'}), remote: true, class: "btn btn-primary btn-sm btn-block" %>
 			<% end %>
-			<%= render partial: 'shop/list_select', locals: {item: i} %>
+			<%# render partial: 'shop/list_select', locals: {item: i} %>
 		</div>
 	</div>
 	

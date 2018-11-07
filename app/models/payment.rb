@@ -3,7 +3,7 @@ class Payment < ActiveRecord::Base
   self.inheritance_column = :payment_type
   belongs_to :account
   belongs_to :payment_method
-  has_many :order_payment_applications, inverse_of: :payment
+  has_many :order_payment_applications, inverse_of: :payment, dependent: :destroy
   has_many :orders, through: :order_payment_applications
   has_many :transactions
   accepts_nested_attributes_for :order_payment_applications
@@ -59,6 +59,10 @@ class Payment < ActiveRecord::Base
 
   def confirm_order_payment
     orders.each(&:confirm_payment)
+  end
+  
+  def refund(sum)
+    puts "reeeeeefunuuuuuund #{sum}"
   end
 
   def amount_refunded

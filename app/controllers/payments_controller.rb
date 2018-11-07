@@ -18,19 +18,16 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    puts payment_params.inspect
-    payment_params[:order_payment_applications_attributes].each do |appl|
-      puts "1. #{appl}"
-      puts "2. #{appl.inspect}"
-      puts "3. #{appl[1]['applied_amount']}"
-      if appl[1]['applied_amount'] == (nil || 0)
-        puts "Were Here"
-        payment_params[:order_payment_applications_attributes].delete(:appl)
+    new_vals = {amount: payment_params[:amount].to_d, account_name: payment_params[:account_name], payment_method_id: payment_params[:payment_method_id], check_number: payment_params[:check_number], payment_type: payment_params[:payment_type], order_payment_applications_attributes: {}}
+    
+    payment_params[:order_payment_applications_attributes].each_with_index do |appl, idx|
+      
+      if (appl[1]['applied_amount'].present?) and (appl[1]['applied_amount'].to_d != "0".to_d)
+        new_vals[:order_payment_applications_attributes].store("#{idx}", {applied_amount: appl[1]['applied_amount'].to_d, order_id: appl[1]['order_id']}).stringify_keys!
       end
     end
-    
-    puts payment_params.inspect
-    @payment = Payment.new(payment_params)
+    new_vals.stringify_keys!
+    @payment = Payment.new(new_vals)
     @payment.save if @payment.valid? && @payment.authorize
     update_index
   end

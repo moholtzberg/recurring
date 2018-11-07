@@ -166,6 +166,8 @@ class ShopController < ApplicationController
     if item_id.nil?
       flash[:error] = "We were not able to find an item with the number <i><em>\"".html_safe + "#{params[:search][:item_number]}" + "\"</em></i>".html_safe
       puts "error"
+    else
+      flash[:error] = nil
     end
   end
   

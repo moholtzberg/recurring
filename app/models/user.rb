@@ -11,6 +11,9 @@ class User < ActiveRecord::Base
   
   belongs_to :account
   belongs_to :customer
+  belongs_to :group
+  has_one :budget, as: :budgetable
+  has_many :managed_accounts, through: :group, source: :accounts
   has_many :user_accounts
   has_many :orders, :through => :account
   has_many :item_lists
@@ -45,6 +48,16 @@ class User < ActiveRecord::Base
   def account_is_valid
     puts "check if the account is valid"
     return true
+  end
+  
+  def budget
+    all_budgets = Budget.all
+    if all_budgets.where('(budgetable_type = ? AND budgetable_id = ?)', "User", id).present?
+      budget = all_budgets.where('(budgetable_type = ? AND appliable_id = ?)', "User", id).last
+    else all_budgets.where('(budgetable_type = ? AND budgetable_id = ?)', "Account", account_id).present?
+      budget = all_budgets.where('(budgetable_type = ? AND budgetable_id = ?)', "Account", account_id).last
+    end
+    return budget
   end
   
   def self.lookup(term)

@@ -28,3 +28,6 @@ solr/*
 *.pid
 .byebug_history
 /shared
+supplyus_secrets.*
+recurring_secrets.*
+.env

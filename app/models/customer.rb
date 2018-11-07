@@ -12,9 +12,4 @@ class Customer < Account
   # has_many :credit_cards
   has_many :orders, :foreign_key => :account_id
   
-  
-  def payment_terms
-    90
-  end
-  
 end

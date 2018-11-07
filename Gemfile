@@ -1,4 +1,5 @@
-ruby "~> 2.3.0"
+ruby "2.3.3"
+
 source 'https://rubygems.org'
 gem 'rails', '~> 4.2.7.1'
 
@@ -14,7 +15,7 @@ gem "jquery-ui-rails"
 gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
-  
+gem 'premailer-rails'
 # gem 'elasticsearch-model'
 # gem 'elasticsearch-rails'
 # gem 'searchkick'
@@ -86,3 +87,4 @@ gem 'summernote-rails'
 gem 'bootstrap-datepicker-rails'
 gem 'paper_trail'
 gem 'lograge'
+gem 'rack-attack'

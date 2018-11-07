@@ -4,8 +4,8 @@ class ReportsController < ApplicationController
   def index; end
 
   def sales_tax
-    @from_date = 12.months.ago.beginning_of_year
-    @to_date = Date.today
+    @from_date = Date.strptime(params[:from_date], '%m/%d/%Y').beginning_of_month
+    @to_date = Date.strptime(params[:to_date], '%m/%d/%Y').end_of_month
     send_report && return if params[:format] == 'email'
     respond_to do |format|
       format.html

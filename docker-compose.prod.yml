@@ -1,22 +1,26 @@
 version: "3.2"
 services:
   sidekiq:
+    container_name: sidekiq
     build: .
     environment:
       RAILS_ENV: production
-    command: bundle exec sidekiq
+    command: bundle exec sidekiq -e production
   memcache:
+    container_name: memcached
     restart: always
     image: memcached
     command: memcached
     expose:
       - "11211"
-  logspout:
-    image: gliderlabs/logspout:latest
-    command: 'syslog://logs6.papertrailapp.com:18256'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  # logspout:
+  #   container_name: logspout
+  #   image: gliderlabs/logspout:latest
+  #   command: 'syslog://logs6.papertrailapp.com:34853'
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
   web_1:
+    container_name: web_1
     build: .
     environment:
       RAILS_ENV: production
@@ -25,8 +29,10 @@ services:
       - "3000:3000"
     links:
       - memcache
-      - logspout
+      # - sidekiq
+      # - logspout
   web_2:
+    container_name: web_2
     build: .
     environment:
       RAILS_ENV: production
@@ -35,4 +41,5 @@ services:
       - "3001:3001"
     links:
       - memcache
-      - logspout
+      # - sidekiq
+      # - logspout

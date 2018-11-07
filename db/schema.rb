@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180326154159) do
+ActiveRecord::Schema.define(version: 20181031125100) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,11 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.string  "name"
     t.string  "service_id"
     t.integer "account_id"
+  end
+
+  create_table "account_shipping_methods", force: :cascade do |t|
+    t.integer "account_id"
+    t.integer "shipping_method_id"
   end
 
   create_table "accounts", force: :cascade do |t|
@@ -66,6 +71,16 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.string  "name"
   end
 
+  create_table "appliable_item_price_limits", force: :cascade do |t|
+    t.string   "appliable_type"
+    t.integer  "appliable_id"
+    t.decimal  "amount"
+    t.integer  "approver_user_id"
+    t.boolean  "hold_order",       default: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "assets", force: :cascade do |t|
     t.string   "type"
     t.integer  "attachment_width"
@@ -100,6 +115,34 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "prefix"
+  end
+
+  create_table "budget_cycle_orders", force: :cascade do |t|
+    t.integer  "budget_cycle_id"
+    t.integer  "order_id"
+    t.decimal  "amount"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "budget_cycles", force: :cascade do |t|
+    t.integer  "budget_id"
+    t.decimal  "remaining_amount"
+    t.date     "start_date"
+    t.date     "end_date"
+    t.datetime "created_at"
+  end
+
+  create_table "budgets", force: :cascade do |t|
+    t.string   "name",                                                  null: false
+    t.integer  "budgetable_id",                                         null: false
+    t.string   "budgetable_type",            limit: 50
+    t.integer  "budget_supervisor_id"
+    t.boolean  "allow_over_budget_ordering",            default: false
+    t.decimal  "amount"
+    t.string   "budget_cycle"
+    t.date     "budget_start"
+    t.datetime "created_at"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -166,6 +209,8 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.integer "requirable_id"
     t.string  "requirable_type"
     t.integer "discount_code_id"
+    t.integer "user_appliable_id"
+    t.string  "user_appliable_type"
   end
 
   create_table "discount_codes", force: :cascade do |t|
@@ -224,6 +269,16 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.string   "supply_type"
     t.string   "supply_color"
     t.integer  "priority"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "flagged_order_line_items", force: :cascade do |t|
+    t.integer  "order_line_item_id"
+    t.integer  "appliable_item_price_limit_id"
+    t.integer  "reviewer_user_id"
+    t.string   "review_state"
+    t.datetime "reviewed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -490,6 +545,7 @@ ActiveRecord::Schema.define(version: 20180326154159) do
   create_table "order_discount_codes", force: :cascade do |t|
     t.integer "discount_code_id"
     t.integer "order_id"
+    t.decimal "amount",           precision: 10, scale: 2
   end
 
   create_table "order_line_items", force: :cascade do |t|
@@ -724,6 +780,7 @@ ActiveRecord::Schema.define(version: 20180326154159) do
     t.text     "notes"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
+    t.string   "state"
   end
 
   create_table "reciepts", force: :cascade do |t|
@@ -863,6 +920,11 @@ ActiveRecord::Schema.define(version: 20180326154159) do
   create_table "user_accounts", force: :cascade do |t|
     t.integer "user_id"
     t.integer "account_id"
+  end
+
+  create_table "user_item_lists", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "item_list_id"
   end
 
   create_table "users", force: :cascade do |t|

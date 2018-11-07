@@ -14,7 +14,7 @@ class AccountsController < ApplicationController
           :label => "#{a.name} #{a.group_name.present? ? "(" + a.group_name + ")" : nil}", :value => "#{a.name}",
           :name => "#{a.name}",
           :address_1 => "#{a.address_1}", :address_2 => "#{a.address_2}", :city => "#{a.city}", text: a.name, id: a.id,
-          :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}"
+          :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}", :bill_to_email => "#{a.bill_to_email}"
         } 
       }
       format.json {render :json => msg}
@@ -44,16 +44,28 @@ class AccountsController < ApplicationController
   end
     
   def create
+    authorize! :read, Customer
     params[:account][:is_taxable] = true unless params[:account][:is_taxable] != 1
     params[:account][:sales_rep_name] = current_user.email unless !params[:account][:sales_rep_name].blank?
+    main_address = params[:account][:main_address_attributes]
     @account = Account.new(account_params)
-    @account.save
-    update_index
+    # @account.main_address.build(main: true, name: main_address["name"], address_1: main_address["address_1"], address_2: main_address["address_2"], city: main_address["city"], state: main_address["state"], zip: main_address["zip"], phone: main_address["phone"], fax: main_address["fax"])
+    # puts @account.main_address.inspect
+    if @account.save!
+      update_index
+    end
   end
   
   def update
     params[:account][:is_taxable] = true unless params[:account][:is_taxable] != 1
     @account.update_attributes(account_params)
+    update_index
+  end
+  
+  def destroy
+    if @account.orders.count == 0
+      @account.destroy
+    end
     update_index
   end
   
@@ -104,7 +116,7 @@ class AccountsController < ApplicationController
   end
 
   def account_params
-    params.require(:account).permit(:name, :sales_rep_name, :email, :group_name, :credit_terms, :credit_limit, :quickbooks_id, :is_taxable, 
+    params.require(:account).permit(:name, :sales_rep_name, :email, :group_name, :credit_terms, :credit_limit, :quickbooks_id, :is_taxable, :replace_items,
       :subscription_week_day, :subscription_month_day, :subscription_quarter_day, main_address_attributes: [:id, :name, :address_1, :address_2, :city, :state, :zip, :phone, :fax])
   end
 

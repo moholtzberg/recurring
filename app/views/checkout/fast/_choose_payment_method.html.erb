@@ -5,10 +5,10 @@
 			<div class="address col-md-6">
 				<%= cc.logo_class %><br/>
 				<%= cc.card_type %><br/>
-				<%= "**** #{cc.last_four} Exp #{cc.expiration}" %><br/>
+				<%= "**** #{cc.last_4} Exp #{cc.expiration}" %><br/>
 			</div>
 			<div class="col-md-6">
-				<%= link_to "Choose", checkout_fast_update_address_path(:address_id => addr.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
+				<%= link_to "Choose", checkout_fast_update_payment_method_path(:payment_method_id => cc.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
 			</div>
 		</div>
 	</div>

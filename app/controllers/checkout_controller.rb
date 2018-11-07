@@ -139,12 +139,18 @@ class CheckoutController < ApplicationController
 
   def apply_code
     discount_code = DiscountCode.find_by(code: params[:discount_code][:code])
-    @order_discount_code = OrderDiscountCode.create(discount_code_id: discount_code.id, order_id: @cart.id) if discount_code
+    @order_discount_code = OrderDiscountCode.find_by(order_id: @cart.id)
+    puts @order_discount_code.inspect
+    if @order_discount_code.present?
+      @order_discount_code.update_attributes(discount_code_id: discount_code.id) if discount_code
+    else
+      @order_discount_code = OrderDiscountCode.find_or_create_by!(discount_code_id: discount_code.id, order_id: @cart.id) if discount_code
+    end
     @cart.reload
   end
 
   def remove_code
-    @cart.order_discount_code.destroy
+    @cart.order_discount_code.update_attributes!(discount_code_id: nil)
     @cart.reload
   end
 
@@ -172,6 +178,111 @@ class CheckoutController < ApplicationController
         OrderMailer.order_confirmation(c.id, :bcc => "sales@247officesupply.com").deliver_later
       end
     end
+  end
+  
+  def fast_checkout
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    if current_user.account
+      a = current_user.account
+      @checkout.ship_to_account_name = a.main_address.name if @checkout.ship_to_account_name.nil?
+      @checkout.ship_to_address_1 = a.main_address.address_1 if @checkout.ship_to_address_1.nil?
+      @checkout.ship_to_address_2 = a.main_address.address_2 if @checkout.ship_to_address_2.nil?
+      @checkout.ship_to_city      = a.main_address.city if @checkout.ship_to_city.nil?
+      @checkout.ship_to_state     = a.main_address.state if @checkout.ship_to_state.nil?
+      @checkout.ship_to_zip       = a.main_address.zip if @checkout.ship_to_zip.nil?
+      @checkout.ship_to_phone     = a.main_address.phone if @checkout.ship_to_phone.nil?
+      @checkout.bill_to_email     = a.bill_to_email if @checkout.bill_to_email.nil?
+    end
+    @checkout.ship_to_attention = "#{current_user.first_name} #{current_user.last_name}" if @checkout.ship_to_attention.nil?
+    @checkout.email             = current_user.email if @checkout.email.nil?
+    @checkout.user_id           = current_user.id if @checkout.user_id.nil?
+  end
+
+  def fast_choose_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fast_new_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @address = Address.new(account_id: params[:account_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fast_create_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @address = Address.new(address_params)
+    saddr = @address
+    @checkout.ship_to_account_name = saddr.name 
+    @checkout.ship_to_address_1 = saddr.address_1 
+    @checkout.ship_to_address_2 = saddr.address_2 
+    @checkout.ship_to_city      = saddr.city 
+    @checkout.ship_to_state     = saddr.state 
+    @checkout.ship_to_zip       = saddr.zip 
+    @checkout.ship_to_phone     = saddr.phone
+    @checkout.save
+    @address.save
+    puts "------------------------------------------------------------------------------------> ** #{@address.inspect}"
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fast_update_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    puts "------------------------------------------------------------------------------------> ** #{params.inspect}"
+    saddr = Address.find(params[:address_id])
+    @checkout.ship_to_account_name = saddr.name 
+    @checkout.ship_to_address_1 = saddr.address_1 
+    @checkout.ship_to_address_2 = saddr.address_2 
+    @checkout.ship_to_city      = saddr.city 
+    @checkout.ship_to_state     = saddr.state 
+    @checkout.ship_to_zip       = saddr.zip 
+    @checkout.ship_to_phone     = saddr.phone
+    @checkout.save
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fast_back_to_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+  end
+
+  def fast_choose_payment_method
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  def fast_update_payment_method
+    # choose payment method.
+    # pass along payment method id 
+    # pass along address id
+  end
+  
+  def fast_back_to_payment
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+  end
+  
+  def fast_new_cc
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @cc = CreditCard.new
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  def fast_create_cc
+    puts "-------------------------------------------- CC Params -> #{params.inspect}"
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @cc = CreditCard.new
+    puts params.inspect
   end
   
   def find_categories

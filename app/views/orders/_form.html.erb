@@ -15,9 +15,12 @@
 					$('#order_account_name').autocomplete({
 						source: $('#order_account_name').data('autocomplete-source'),
 						focus: function( event, ui ) {
+							console.log(ui.item)
 							$("#order_account_name" ).val( ui.item.value );
 							$("#order_bill_to_account_name" ).val( ui.item.value );
 							$("#order_ship_to_account_name" ).val( ui.item.value );
+							$("#order_bill_to_email" ).val( ui.item.bill_to_email );
+							$("#order_email" ).val( ui.item.email );
 							$(".ui-helper-hidden-accessible").remove()
 							return false;
 						},
@@ -26,6 +29,7 @@
 								url : '/admin/accounts/' + ui.item.id + '.json',
 								success: function(data) {
 									addresses = data.addresses
+									console.log(addresses)
 									var $el = $(".billing_address, .shipping_address");
 									$el.empty();
 									$el.append($("<option value></option>"));
@@ -47,6 +51,7 @@
 	          $(':input#order_bill_to_state').val(current_address['state']);
 	          $(':input#order_bill_to_zip').val(current_address['zip']);
 	          $(':input#order_bill_to_phone').val(current_address['phone']);
+	          $(':input#order_bill_to_email').val(current_address['bill_to_email']);
 	        })
 	        $('select.shipping_address').change(function(){
 	          var $select = $(this);
@@ -57,6 +62,7 @@
 	          $(':input#order_ship_to_state').val(current_address['state']);
 	          $(':input#order_ship_to_zip').val(current_address['zip']);
 	          $(':input#order_ship_to_phone').val(current_address['phone']);
+	          $(':input#order_ship_to_email').val(current_address['ship_to_email']);
 	        })
 				});
 			</script>
@@ -231,7 +237,7 @@
 		<div class="col-md-12">
 			<%= f.fields_for :order_discount_code do |e| %>
 				<%= e.label :discount_code_id %>
-				<%= e.select(:discount_code_id, DiscountCode.joins(:effect).all.collect {|a| [a.name, a.id]}, {:include_blank => "Select Discount Code"}, {:class => "form-control col-md-12 input-sm"}) %>
+				<%= e.select(:discount_code_id, DiscountCode.joins(:discount_code_effect).all.collect {|a| [a.name, a.id]}, {:include_blank => "Select Discount Code"}, {:class => "form-control col-md-12 input-sm"}) %>
 				<%= e.hidden_field(:id) %>
 			<% end %>
 		</div>

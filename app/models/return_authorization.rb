@@ -91,6 +91,6 @@ class ReturnAuthorization < ActiveRecord::Base
   end
 
   def refund_payment
-    order.payments.first.refund(amount)
+    order.payments.first.refund(amount) if order.payments.first.payment_type == "CreditCardPayment" and order.payments.first.success == true else line_item_returns.each {|li| li.touch}
   end
 end

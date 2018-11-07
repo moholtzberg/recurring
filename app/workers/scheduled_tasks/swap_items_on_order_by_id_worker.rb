@@ -8,8 +8,8 @@ module ScheduledTasks
 
     def perform(order_id)
       order = Order.find(order_id)
-      if order.stare == "pending"
-        if order.account and order.account.replace_items == true
+      if order.state == "pending"
+        if order.account and order.account.replace_items == true and order.notes.blank?
           order.order_line_items.each do |line_item|
             if line_item.item and (line_item.item.item_substitutes.size > 0)
               subs = line_item.item.item_substitutes
@@ -41,6 +41,8 @@ module ScheduledTasks
               end
             end
           end
+          
+          order.state = "processing"
         end
       end
     end
