@@ -31,3 +31,4 @@ solr/*
 supplyus_secrets.*
 recurring_secrets.*
 .env
+recurring_secrets.yml
