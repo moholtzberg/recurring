@@ -1,0 +1,22 @@
+<div id="checkout_bill_to_address" class="checkout_section col-md-12">
+	
+	<div class="col-md-3 text-right">
+		<strong>Bill To Address:</strong>
+	</div>
+	
+	<div class="col-md-9" id="bill_to_address">
+		
+		<%= @checkout.bill_to_account_name %><br/>
+		<%= @checkout.bill_to_address_1 %><br/>
+		<%= @checkout.bill_to_address_2 %><% unless @checkout.bill_to_address_2.blank? %><br/><% end %>
+		<%= @checkout.bill_to_city %>, <%= @checkout.bill_to_state %> <%= @checkout.bill_to_zip %><br/>
+		
+		<% if current_user.account.addresses.size > 1 %>
+			<%= link_to "Choose a Different Address", checkout_fast_choose_bill_to_address_path, :remote => true %> | 
+		<% end %>
+
+		<%= link_to "Enter a New Address", checkout_fast_new_address_path(:account_id => current_user.account_id), remote: true %>
+		
+	</div>
+	
+</div>

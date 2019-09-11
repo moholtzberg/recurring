@@ -2,7 +2,7 @@
 	
 	<div class="col-md-12">
 		
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<%= f.label :vendor %>
 			<%= f.select :vendor_id, @vendors.collect {|p| [p.name, p.id, 
 				:vendor_name => p.name, :ship_to_address_1 => p.address_1, :ship_to_address_2 => p.address_2, :ship_to_city => p.city, :ship_to_state => p.state, :ship_to_zip => p.zip, :ship_to_phone => p.phone
@@ -28,12 +28,12 @@
 			})
 		</script>
 
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<%= f.label :number %>
 			<%= f.text_field(:number, :class => "form-control") %>
 		</div>
 	
-		<div class="col-md-4">
+		<div class="col-md-3">
 			<%= f.label :completed_at %>
 			
 			<% if @purchase_order.completed_at.blank? %>
@@ -45,6 +45,13 @@
 			<%= f.datetime_field(:completed_at, :disabled => true, :class => "form-control", :value => @purchase_order.completed_at.strftime("%m/%d/%Y %I:%M %p")) %>
 			
 			<% end %>
+		</div>
+		
+		<div class="col-md-3">
+			<%= f.label :state %>
+			
+			<%= f.text_field(:state, :class => "form-control") %>
+		
 		</div>
 		
 		<div class="col-md-12">

@@ -1,0 +1,14 @@
+<% @shipping_methods.each do |sm| %>
+	
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="address col-md-6">
+				<%= sm.name %> <%= number_to_currency(sm.calculate(@checkout.sub_total)) %>
+			</div>
+			<div class="col-md-6">
+				<%= link_to "Choose", checkout_fast_update_shipping_method_path(:shipping_method_id => sm.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
+			</div>
+		</div>
+	</div>
+	
+<% end %>

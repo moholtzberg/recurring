@@ -25,7 +25,8 @@ class SubscriptionMailer < ApplicationMailer
       eventable_type: 'Subscription',
       eventable_id: @subscription.id
     })
-    headers['X-Mailgun-Variables'] = @email_delivery.id
+    email.mailgun_variables = {record_id: @email_delivery.id}
+    # headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
 end

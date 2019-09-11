@@ -6,7 +6,12 @@ class OrdersController < ApplicationController
 
   def datatables
     authorize! :read, Order
-    render json: OrderDatatable.new(view_context, from: params[:from], filters: params[:filters])
+    if current_user.has_role?(:sales)
+      render json: OrderDatatable.new(view_context, current_user_id: current_user.id, from: params[:from], filters: params[:filters])
+    else
+      render json: OrderDatatable.new(view_context, from: params[:from], filters: params[:filters])
+    end
+    
   end
 
   def autocomplete
@@ -118,7 +123,7 @@ class OrdersController < ApplicationController
     authorize! :update, Order
     @order.update_attribute(:locked, !@order.locked)
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end
@@ -127,7 +132,7 @@ class OrdersController < ApplicationController
     authorize! :update, Order
     @order.approve
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end
@@ -136,7 +141,7 @@ class OrdersController < ApplicationController
     authorize! :update, Order
     @order.submit
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end
@@ -145,7 +150,7 @@ class OrdersController < ApplicationController
     authorize! :update, Order
     @order.cancel
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end
@@ -155,7 +160,7 @@ class OrdersController < ApplicationController
     @order.credit_hold = !@order.credit_hold
     @order.save
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end
@@ -164,7 +169,7 @@ class OrdersController < ApplicationController
     authorize! :update, Order
     @order.remove_hold
     respond_to do |format|
-      format.html { redirect_to action: 'edit', id: @order.id }
+      format.html { redirect_to action: 'show', id: @order.id }
       format.js { render :update }
     end
   end

@@ -1,33 +1,49 @@
+# default: &default
+#   pool: 25
+#   timeout: 5000
 default: &default
-  pool: 25
-  timeout: 5000
+  adapter: postgresql
+  encoding: unicode
+  host: db
+  port: 5432
+  username: timbuktu
+  password: mysecretpassword
+  pool: 5
+
+development:
+  <<: *default
+  database: myapp_development
 
 production:
   <<: *default
-  adapter: <%= SECRET["DATABASE"]["PROD_ENGINE"] %>
-  host: <%= SECRET["DATABASE"]["PROD_HOST"] %>
-  database: <%= SECRET["DATABASE"]["PROD_DB"] %>
-  username: <%= SECRET["DATABASE"]["PROD_UN"] %>
-  password: <%= SECRET["DATABASE"]["PROD_PW"] %>
-  port: <%= SECRET["DATABASE"]["PROD_PORT"] %>
+  database: myapp_production
 
-staging:
-  <<: *default
-  adapter: <%= SECRET["DATABASE"]["STG_ENGINE"] %>
-  host: <%= SECRET["DATABASE"]["STG_HOST"] %>
-  database: <%= SECRET["DATABASE"]["STG_DB"] %>
-  username: <%= SECRET["DATABASE"]["STG_UN"] %>
-  password: <%= SECRET["DATABASE"]["STG_PW"] %>
-  port: <%= SECRET["DATABASE"]["STG_PORT"] %>
-  
-development:
-  <<: *default
-  adapter: <%= SECRET["DATABASE"]["PROD_ENGINE"] %>
-  host: <%= SECRET["DATABASE"]["PROD_HOST"] %>
-  database: <%= SECRET["DATABASE"]["PROD_DB"] %>
-  username: <%= SECRET["DATABASE"]["PROD_UN"] %>
-  password: <%= SECRET["DATABASE"]["PROD_PW"] %>
-  port: <%= SECRET["DATABASE"]["PROD_PORT"] %>
+# production:
+#   <<: *default
+#   adapter: <%= SECRET["DATABASE"]["PROD_ENGINE"] %>
+#   host: <%= SECRET["DATABASE"]["PROD_HOST"] %>
+#   database: <%= SECRET["DATABASE"]["PROD_DB"] %>
+#   username: <%= SECRET["DATABASE"]["PROD_UN"] %>
+#   password: <%= SECRET["DATABASE"]["PROD_PW"] %>
+#   port: <%= SECRET["DATABASE"]["PROD_PORT"] %>
+#
+# staging:
+#   <<: *default
+#   adapter: <%= SECRET["DATABASE"]["STG_ENGINE"] %>
+#   host: <%= SECRET["DATABASE"]["STG_HOST"] %>
+#   database: <%= SECRET["DATABASE"]["STG_DB"] %>
+#   username: <%= SECRET["DATABASE"]["STG_UN"] %>
+#   password: <%= SECRET["DATABASE"]["STG_PW"] %>
+#   port: <%= SECRET["DATABASE"]["STG_PORT"] %>
+#
+# development:
+#   <<: *default
+#   adapter: <%= SECRET["DATABASE"]["PROD_ENGINE"] %>
+#   host: <%= SECRET["DATABASE"]["PROD_HOST"] %>
+#   database: <%= SECRET["DATABASE"]["PROD_DB"] %>
+#   username: <%= SECRET["DATABASE"]["PROD_UN"] %>
+#   password: <%= SECRET["DATABASE"]["PROD_PW"] %>
+#   port: <%= SECRET["DATABASE"]["PROD_PORT"] %>
 
 # development:
 #   <<: *default

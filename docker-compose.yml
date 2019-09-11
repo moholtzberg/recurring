@@ -10,41 +10,60 @@ services:
       - "6379"
   sidekiq:
     build: .
+    environment:
+      RAILS_ENV: production
     command: bundle exec sidekiq
-    volumes:
-      - .:/recurring
+    # volumes:
+    #   - .:/recurring
     links:
+      - solr
       - db
       - redis
-  db:
+  memcache:
+    container_name: memcached
     restart: always
+    image: memcached
+    command: memcached
+    expose:
+      - "11211"
+  db:
+    # restart: always
     image: postgres
     volumes:
       - postgresql-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=timbuktu
+      - POSTGRES_PASSWORD=mysecretpassword
   solr:
     build: .
     expose:
       - "80"
-    volumes:
-      - .:/recurring
+    # volumes:
+    #   - .:/recurring
     links:
+      - db
+    depends_on:
       - db
     command: bundle exec rake sunspot:solr:run
   web:
     build: .
-    command: rails server -p 3000 -b '0.0.0.0'
-    volumes:
-      - .:/recurring
+    environment:
+      RAILS_ENV: production
+    command: bundle exec rails server -p 3000 -b "0.0.0.0"
+    # volumes:
+    #   - .:/recurring
     ports:
       - "3000:3000"
     links:
       - solr
       - db
       - redis
-    stdin_open: true
-    tty: true
+    depends_on:
+      - db
+    # stdin_open: true
+    # tty: true
 volumes:
   postgresql-data:
-    external: true
+    external: false
   redis:
-    external: true
+    external: false

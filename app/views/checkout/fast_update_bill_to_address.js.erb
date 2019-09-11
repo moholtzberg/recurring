@@ -1,0 +1,3 @@
+<% unless flash[:error] %>
+	$("div#checkout_bill_to_address").replaceWith("<%= j render :partial => 'checkout/fast/bill_to_address', :format => 'html' %>")
+<% end %>

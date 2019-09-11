@@ -7,7 +7,9 @@ $(document).on('turbolinks:load', function() {
                                 number: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
                                 account: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
                                 state: ['Equal to', 'Contains', 'Begins with', 'Ends with', 'Not equal to'],
+                                po_number: ['Equal to', 'Contains'],
                                 submitted_at: ['Equal to', 'Greater than', 'Less than'],
+                                total: ['Equal to', 'Greater than', 'Less than'],
                                 sub_total: ['Equal to', 'Greater than', 'Less than']
                               }
 
@@ -133,7 +135,9 @@ $(document).on('turbolinks:load', function() {
                                 <option value></option> \
                                 <option value="number">Number</option> \
                                 <option value="account">Account</option> \
+                                <option value="total">Total</option> \
                                 <option value="sub_total">Sub Total</option> \
+                                <option value="po_number">PO Number</option> \
                                 <option value="submitted_at">Submitted At</option> \
                                 <option value="state">State</option> \
                               </select> \
@@ -285,6 +289,7 @@ $(document).on('turbolinks:load', function() {
         {"data": "shipped", sortable: false, className: "all"},
         {"data": "fulfilled", sortable: false, className: "all"},
         {"data": "balance_due", sortable: false, className: "all"},
+        {"data": "po_number", className: "all"},
         {"data": "submitted_at", className: "all"},
         {"data": "state", className: "all"},
         {"data": "dropdown", sortable: false, className: "all"}

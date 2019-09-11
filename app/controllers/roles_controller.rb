@@ -42,7 +42,7 @@ class RolesController < ApplicationController
     authorize! :update, Role
     if @role.update(role_params)
       # Destroy first marked permissions (params[:destroy_ids] - check to destroy)
-      destroy_ids = params[:destroy_ids].reject(&:blank?).map(&:to_i).uniq
+      destroy_ids = params[:destroy_ids]&.reject(&:blank?)&.map(&:to_i)&.uniq if params[:destroy_ids].present?
       Permission.where(id: destroy_ids).destroy_all
 
       permissions = permissions_params

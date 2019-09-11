@@ -10,7 +10,7 @@
 				<%= addr.phone %>
 			</div>
 			<div class="col-md-6">
-				<%= link_to "Choose", checkout_fast_update_address_path(:address_id => addr.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
+				<%= link_to "Choose", checkout_fast_update_bill_to_address_path(:address_id => addr.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
 			</div>
 		</div>
 	</div>

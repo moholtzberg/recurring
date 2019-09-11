@@ -122,7 +122,7 @@ class CheckoutController < ApplicationController
       @payment.credit_card_id = @card&.id
       @checkout.terms = "Credit Card"
     else
-      @payment.payment_type =  'CheckPayment'
+      @payment.payment_type = 'CheckPayment'
       @payment.amount = 0
       @payment = @payment.becomes CheckPayment
       @checkout.terms = params[:payment_method] == "terms" ? "Net #{@checkout.account.credit_terms}" : "Check"
@@ -130,6 +130,7 @@ class CheckoutController < ApplicationController
     @cards = current_user.account.main_service.credit_cards
     if (@payment.payment_type == 'CheckPayment' or (@card and @card.errors.empty?)) and @payment.authorize
       @payment.save
+      @checkout.save
       OrderPaymentApplication.create(:order_id => @checkout.id, :payment_id => @payment.id, :applied_amount => @payment.amount)
       submit
     else
@@ -191,20 +192,51 @@ class CheckoutController < ApplicationController
       @checkout.ship_to_state     = a.main_address.state if @checkout.ship_to_state.nil?
       @checkout.ship_to_zip       = a.main_address.zip if @checkout.ship_to_zip.nil?
       @checkout.ship_to_phone     = a.main_address.phone if @checkout.ship_to_phone.nil?
+      
+      @checkout.bill_to_account_name = a.main_address.name if @checkout.bill_to_account_name.nil?
+      @checkout.bill_to_address_1 = a.main_address.address_1 if @checkout.bill_to_address_1.nil?
+      @checkout.bill_to_address_2 = a.main_address.address_2 if @checkout.bill_to_address_2.nil?
+      @checkout.bill_to_city      = a.main_address.city if @checkout.bill_to_city.nil?
+      @checkout.bill_to_state     = a.main_address.state if @checkout.bill_to_state.nil?
+      @checkout.bill_to_zip       = a.main_address.zip if @checkout.bill_to_zip.nil?
+      @checkout.bill_to_phone     = a.main_address.phone if @checkout.bill_to_phone.nil?
+      
       @checkout.bill_to_email     = a.bill_to_email if @checkout.bill_to_email.nil?
     end
     @checkout.ship_to_attention = "#{current_user.first_name} #{current_user.last_name}" if @checkout.ship_to_attention.nil?
     @checkout.email             = current_user.email if @checkout.email.nil?
     @checkout.user_id           = current_user.id if @checkout.user_id.nil?
+    @checkout.save!
+    if @checkout.terms&.match(/Credit Card_([0-9]{1,4})/)
+      @cc = CreditCard.find_by(id: @checkout.terms.match(/Credit Card_([0-9]{1,4})/)[1])
+    end
+    @shipping_method = ShippingMethod.where(active: true).collect {|a| [a.id, a.calculate(@cart.sub_total)]}.to_h
+    @shipping_method = ShippingMethod.find_by(id: @shipping_method.key(@shipping_method.values.min))
+    
   end
 
-  def fast_choose_address
+  def fast_choose_ship_to_address
     @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
     respond_to do |format|
       format.js
     end
   end
-
+  
+  def fast_choose_bill_to_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  def fast_choose_shipping_method
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @shipping_methods = ShippingMethod.where(active: true)
+    respond_to do |format|
+      format.js
+    end
+  end
+  
   def fast_new_address
     @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
     @address = Address.new(account_id: params[:account_id])
@@ -232,7 +264,7 @@ class CheckoutController < ApplicationController
     end
   end
 
-  def fast_update_address
+  def fast_update_ship_to_address
     @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
     puts "------------------------------------------------------------------------------------> ** #{params.inspect}"
     saddr = Address.find(params[:address_id])
@@ -243,12 +275,43 @@ class CheckoutController < ApplicationController
     @checkout.ship_to_state     = saddr.state 
     @checkout.ship_to_zip       = saddr.zip 
     @checkout.ship_to_phone     = saddr.phone
-    @checkout.save
+    @checkout.save!
     respond_to do |format|
       format.js
     end
   end
-
+  
+  def fast_update_bill_to_address
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    puts "------------------------------------------------------------------------------------> ** #{params.inspect}"
+    saddr = Address.find(params[:address_id])
+    @checkout.bill_to_account_name = saddr.name 
+    @checkout.bill_to_address_1 = saddr.address_1 
+    @checkout.bill_to_address_2 = saddr.address_2 
+    @checkout.bill_to_city      = saddr.city 
+    @checkout.bill_to_state     = saddr.state 
+    @checkout.bill_to_zip       = saddr.zip 
+    @checkout.bill_to_phone     = saddr.phone
+    @checkout.save!
+    respond_to do |format|
+      format.js
+    end
+  end
+  
+  def fast_update_shipping_method
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @shipping_method = ShippingMethod.find_by(:id => params[:shipping_method_id])
+    unless OrderShippingMethod.find_by(:order_id => cookies.permanent.signed[:cart_id]).nil?
+      o = OrderShippingMethod.find_by(:order_id => cookies.permanent.signed[:cart_id])
+    else
+      o = OrderShippingMethod.new(:order_id => cookies.permanent.signed[:cart_id])
+    end
+    o.update_attributes(:shipping_method_id => @shipping_method.id, :amount => @shipping_method.calculate(@cart.sub_total))
+    respond_to do |format|
+      format.js
+    end
+  end
+  
   def fast_back_to_address
     @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
   end
@@ -261,9 +324,18 @@ class CheckoutController < ApplicationController
   end
   
   def fast_update_payment_method
+    @checkout = Checkout.find_by(:id => cookies.permanent.signed[:cart_id])
+    @checkout.terms = params[:terms] == "Credit Card" ? "#{params[:terms]}_#{params[:credit_card_id]}" : params[:terms]
+    @checkout.save!
+    puts params[:credit_card_id]
+    @cc = CreditCard.find_by(id: params[:credit_card_id])
+    puts @cc.inspect
     # choose payment method.
     # pass along payment method id 
     # pass along address id
+    respond_to do |format|
+      format.js
+    end
   end
   
   def fast_back_to_payment
@@ -309,7 +381,7 @@ class CheckoutController < ApplicationController
   end
   
   def checkout_params
-    params.require(:checkout).permit(:credit_hold,
+    params.require(:checkout).permit(:credit_hold, :credit_card_id, :terms,
     :bill_to_account_name, :bill_to_attention, :bill_to_address_1, :bill_to_address_2, :bill_to_city, :bill_to_state, :bill_to_zip, :bill_to_phone, :bill_to_email,
     :ship_to_account_name, :ship_to_attention, :ship_to_address_1, :ship_to_address_2, :ship_to_city, :ship_to_state, :ship_to_zip, :ship_to_phone, :po_number, :email, :notes
     )

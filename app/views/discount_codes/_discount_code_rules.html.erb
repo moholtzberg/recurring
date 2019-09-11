@@ -12,7 +12,7 @@
 		<th>Remove</th>
 	</tr>
 
-	<% discount_code.rules.each do |rule| %>
+	<% discount_code.discount_code_rules.each do |rule| %>
 		<tr>
 			<td><%= rule.quantity %></td>
 			<td><%= rule.amount %></td>

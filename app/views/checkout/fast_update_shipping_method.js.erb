@@ -1,0 +1,4 @@
+<% unless flash[:error] %>
+	$("div#checkout_shipping_method").replaceWith("<%= j render :partial => 'checkout/fast/shipping_method', :format => 'html' %>")
+	$("div#checkout_summary").replaceWith("<%= j render :partial => 'checkout/fast/summary', :format => 'html' %>")
+<% end %>

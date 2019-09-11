@@ -36,7 +36,6 @@ module ApplicationHelper
   end
   
   def get_number_from_record_number(record_number)
-    
     record_number.sub!(/[A-Za-z]+/, "")
     return record_number
   end

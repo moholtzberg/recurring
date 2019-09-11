@@ -1,5 +1,17 @@
+	<% if @checkout.terms =~ /Credit Card/ %>
+	
+		<%= @cc.cardholder_name %><br/>
+		<i class="<%= @cc.logo_class %>"></i> <%= @cc.card_type %> <%= "**** #{@cc.last_4} Exp #{@cc.expiration}" %><br/>
+		
+	<% elsif @checkout.terms ==  "Net #{current_user.account.credit_terms}" %>
+	
+		Net <%= current_user.account.credit_terms %>
+		Payment for this order will be due no later than <%= (Date.today + current_user.account.payment_terms.days).strftime("%m/%d/%Y") %><br/>
+	
+	<% else %>
+		
 		<% if current_user.account.has_credit == true %>
-			
+		
 			Net <%= current_user.account.credit_terms %>
 			Payment for this order will be due no later than <%= (Date.today + current_user.account.payment_terms.days).strftime("%m/%d/%Y") %><br/>
 			
@@ -12,9 +24,11 @@
 		<% else %>
 		
 			<% if current_user.account.main_service.credit_cards.any? %>
-				<% current_user.account.main_service.credit_cards.last do |cc| %>
-					<%= cc.inspect %>
-				<% end %>
+			
+				<% cc = current_user.account.main_service.credit_cards.last %>
+				<%= cc.cardholder_name %><br/>
+				<i class="<%= cc.logo_class %>"></i> <%= cc.card_type %> <%= "**** #{cc.last_4} Exp #{cc.expiration}" %><br/>
+				
 			<% else %>
 			
 				<%= render :partial => "checkout/fast/braintree_cc_form" %>
@@ -22,5 +36,8 @@
 			<% end %>
 			
 		<% end %>
-		
-		<%= link_to "Choose a Different Payment Method", checkout_fast_choose_payment_method_path, remote: true %>
+	
+	<% end %>
+	
+	<%= link_to "Choose a Different Payment Method", checkout_fast_choose_payment_method_path, remote: true %>
+	

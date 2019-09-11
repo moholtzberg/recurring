@@ -27,7 +27,15 @@ class PaymentsController < ApplicationController
       end
     end
     new_vals.stringify_keys!
-    @payment = Payment.new(new_vals)
+    if payment_params[:payment_type] == 'CreditCardPayment'
+      if !payment_params[:credit_card_id].blank?
+        @payment = CreditCardPayment.new(new_vals)
+        @card = CreditCard.find_by(id: payment_params[:credit_card_id])
+        @payment.credit_card_id = @card.id
+      end
+    else
+      @payment = Payment.new(new_vals)
+    end
     @payment.save if @payment.valid? && @payment.authorize
     update_index
   end
@@ -35,6 +43,9 @@ class PaymentsController < ApplicationController
   def edit; end
 
   def update
+    if (@payment.order_payment_applications.size == 1)
+      @payment.order_payment_applications.first.update_columns(applied_amount: payment_params[:amount])
+    end
     @payment.update_attributes(payment_params)
   end
 

@@ -20,9 +20,13 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   config.active_job.queue_adapter = :sidekiq
   
-  config.action_mailer.raise_delivery_errors = false
-  # config.action_mailer.delivery_method = :smtp
+  config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.delivery_method = :mailgun
   config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.mailgun_settings = {
+    api_key: "#{SECRET['MAILGUN_API_KEY']}",
+    domain: "#{SECRET['MAILGUN_SMTP_DOMAIN']}"
+  }
   config.action_mailer.smtp_settings = {
     address:              "#{SECRET['MAILGUN_SMTP_ADDRESS']}",
     port:                 587,

@@ -40,7 +40,7 @@ class DiscountCodesController < ApplicationController
   end
 
   def update_index
-    @discount_codes = DiscountCode.includes(:effect).order(sort_column + " " + sort_direction)
+    @discount_codes = DiscountCode.includes(:discount_code_effect).order(sort_column + " " + sort_direction)
     unless params[:term].blank?
       @discount_codes = @discount_codes.lookup(params[:term]) if params[:term].present?
     end

@@ -1,7 +1,7 @@
 class Order < ActiveRecord::Base
   
   include ApplicationHelper
-  has_paper_trail
+  # has_paper_trail
   
   scope :is_locked, -> () { where(:locked => true) }
   scope :is_complete, -> () { where(state: [:completed, :fulfilled])}
@@ -13,7 +13,7 @@ class Order < ActiveRecord::Base
   scope :has_account, -> () { where.not(:account_id => nil) }
   scope :no_account, -> () { where(:account_id => nil) }
   scope :by_date_range, -> (from, to) { where("due_date >= ? AND due_date <= ?", from, to) }
-  scope :by_date_range_submitted_at, -> (from, to) { where("submitted_at >= ? AND submitted_at'[] <= ?", from, to) }
+  scope :by_date_range_submitted_at, -> (from, to) { where("submitted_at >= ? AND submitted_at <= ?", from, to) }
   scope :lookup, lambda { |q|
     includes(
       :account => [:group],
@@ -111,7 +111,13 @@ class Order < ActiveRecord::Base
     end
     
     event :approve_items_over_price_limit do
+      transition :flagged_items_over_price_limit => :flagged_order_total_exeeds_budget, if: -> (order) {order.user&.budget&.current_cycle&.remaining_amount and order.user&.budget&.current_cycle&.remaining_amount.to_d < order.total}
       transition :flagged_items_over_price_limit => :pending
+    end
+    
+    event :approve_order_total_exceeds_budget do
+      transition :flagged_order_total_exeeds_budget => :flagged_items_over_price_limit, if: -> (order) {(order.order_line_items.map {|oli| oli.price > order.item_price_limit&.amount.to_f.to_d and order.item_price_limit}).include?(true)}
+      transition :flagged_order_total_exeeds_budget => :pending
     end
     
     event :reject_items_over_price_limit do
@@ -162,9 +168,9 @@ class Order < ActiveRecord::Base
     end
 
     event :confirm_shipment do
-      transition [:awaiting_shipment, :partially_shipped] => :completed, if: -> (order) { order.shipped and order.fulfilled }
-      transition [:awaiting_shipment, :partially_shipped] => :awaiting_fulfillment, if: -> (order) { order.shipped }
-      transition [:awaiting_shipment, :partially_shipped] => :partially_shipped
+      transition [:processing, :awaiting_shipment, :partially_shipped] => :completed, if: -> (order) { order.shipped and order.fulfilled }
+      transition [:processing, :awaiting_shipment, :partially_shipped] => :awaiting_fulfillment, if: -> (order) { order.shipped }
+      transition [:processing, :awaiting_shipment, :partially_shipped] => :partially_shipped
     end
 
     event :confirm_fulfillment do
@@ -182,7 +188,7 @@ class Order < ActiveRecord::Base
   def terms_payment?
     # payments.map {|p| p.payment_method.name }.uniq == ['terms'] and account.has_enough_credit
     # payments.nil? and account.has_enough_credit
-    terms == "terms"
+    terms.start_with?('Net')
   end
   
   def state_is_not_fulfilled?
@@ -533,7 +539,7 @@ class Order < ActiveRecord::Base
       if account.payment_terms
         self.submitted_at + account.payment_terms
       else
-        self.submitted_at + 30.days
+        self.submitted_at
       end
     end
   end

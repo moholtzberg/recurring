@@ -85,8 +85,6 @@
 	<%= render :partial => "order_discount_code_form" %>
 <% end %>
 
-<%= @checkout.number %>
-<%= @checkout.id %>
 <table class="table table-bordered">
 	<% if @checkout && @checkout.errors.any? %>
 		<div id="checkout_errors" class="alert alert-warning">
@@ -128,7 +126,9 @@
 				<% end %>
 				
 				<option value="credit_card">New Credit Card</option>
+				<% if Setting.find_by(key: "enable_check_payments")&.value == true %>
 				<option value="check">Check</option>
+				<% end %>
 			</select>
 
 			<script>

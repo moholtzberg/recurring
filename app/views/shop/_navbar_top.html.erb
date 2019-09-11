@@ -2,6 +2,9 @@
 
 	<div class="header-top-left">
 		<ul class="list-inline">
+			<% if current_user and  current_user.budget %>
+			<li><span class="alert alert-info">You have <%= number_to_currency(current_user.budget&.current_cycle&.remaining_amount) %> remaining unitl the end of your budget cycle on <%= current_user.budget&.current_cycle&.end_date %></span></li>
+			<% end %>
 			<li>&nbsp;</li>
 		</ul>
 		
@@ -19,13 +22,19 @@
 			<li class="dropdown">
 				Hello <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= "#{current_user.email}" %> <b class="caret"></b></a>
 				<ul class="dropdown-menu dropdown-menu-right">
+					
+					<% if current_user.has_role?(:Sales) || current_user.has_role?(:super_admin) || current_user.has_role?(:Support) %>
+					<li><%= link_to I18n.t(:admin_dashboard), "/admin" %></strong></li>
+					<li class="divider"></li>
+					<% end %>
+					
 					<li><%= link_to I18n.t(:my_account), "/my_account" %></li>
 					<% if current_user.account %><li><%= link_to I18n.t(:my_items), "/my_account/items" %></li><% end %>
 					<li><%= link_to 'My Orders', "/my_account/#{current_user.account_id}" %></li>
 					<li><%= link_to 'My Subscriptions', my_account_subscriptions_path %></li>
 					<li><%= link_to 'My Credit Cards', my_account_credit_cards_path %></li>
 					<%= render :partial => "shop/lists" %>
-					<li><%= link_to "Change password", edit_user_registration_path, :remote => true %></li>
+					<li><%= link_to I18n.t(:change_password), edit_user_registration_path, :remote => true %></li>
 					<li class="divider"></li>
 					<li><%= link_to I18n.t(:logout), destroy_user_session_path, :method => "delete" %></li>
 				</ul>

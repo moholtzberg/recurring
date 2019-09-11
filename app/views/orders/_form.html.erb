@@ -4,7 +4,7 @@
 		
 		<div class="col-md-12">
 			
-			<div class="col-md-2">
+			<div class="col-md-4">
 				<%= f.label :account_name, :class => "control-label" %>
 				<%= f.text_field :account_name, :class => "form-control", data: {autocomplete_source: accounts_path} %>
 			</div>
@@ -17,6 +17,7 @@
 						focus: function( event, ui ) {
 							console.log(ui.item)
 							$("#order_account_name" ).val( ui.item.value );
+							$("#order_sales_rep_name").val( ui.item.sales_rep_name );
 							$("#order_bill_to_account_name" ).val( ui.item.value );
 							$("#order_ship_to_account_name" ).val( ui.item.value );
 							$("#order_bill_to_email" ).val( ui.item.bill_to_email );
@@ -51,7 +52,7 @@
 	          $(':input#order_bill_to_state').val(current_address['state']);
 	          $(':input#order_bill_to_zip').val(current_address['zip']);
 	          $(':input#order_bill_to_phone').val(current_address['phone']);
-	          $(':input#order_bill_to_email').val(current_address['bill_to_email']);
+	          // $(':input#order_bill_to_email').val(current_address['bill_to_email']);
 	        })
 	        $('select.shipping_address').change(function(){
 	          var $select = $(this);
@@ -62,22 +63,25 @@
 	          $(':input#order_ship_to_state').val(current_address['state']);
 	          $(':input#order_ship_to_zip').val(current_address['zip']);
 	          $(':input#order_ship_to_phone').val(current_address['phone']);
-	          $(':input#order_ship_to_email').val(current_address['ship_to_email']);
+	          // $(':input#order_ship_to_email').val(current_address['ship_to_email']);
 	        })
 				});
 			</script>
 	
-			<div class="col-md-2">
+			<div class="col-md-4">
 				<%= f.label :number %>
 				<%= f.text_field(:number, :class => "form-control") %>
 			</div>
 	
-			<div class="col-md-2">
+			<div class="col-md-4">
 				<%= f.label "PO Number" %>
 				<%= f.text_field(:po_number, :class => "form-control") %>
 			</div>
+		</div>
+		
+		<div class="col-md-12">
 			
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<%= f.label :submitted_at %>
 				
 				<% if @order.submitted_at.blank? %>
@@ -91,14 +95,20 @@
 				<% end %>
 			</div>
 			
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<%= f.label "Sales Rep" %>
 				<%= f.text_field(:sales_rep_name, :class => "form-control", data: {autocomplete_source: sales_reps_path}) %>
 			</div>
 
-			<div class="col-md-2">
+			<div class="col-md-3">
 				<%= f.label "State" %>
 				<%= f.text_field(:state, :class => "form-control") %>
+			</div>
+			
+			<div class="col-md-3">
+				<%= f.label "Terms" %>
+				<% terms_options = ["Credit Card", "Net #{@order&.account&.credit_terms}"] %>
+				<%= f.select(:terms, options_for_select(terms_options), {}, {:class => "form-control"}) %>
 			</div>
 			
 			<script>

@@ -9,10 +9,11 @@ class AccountsController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      msg = @accounts.includes(:addresses, account_payment_services: :credit_cards).map {|a| 
+      msg = @accounts.includes(:addresses, account_payment_services: :credit_cards).map {|a|
+        puts a.sales_rep_name
         {
           :label => "#{a.name} #{a.group_name.present? ? "(" + a.group_name + ")" : nil}", :value => "#{a.name}",
-          :name => "#{a.name}",
+          :name => "#{a.name}", :sales_rep_name => "#{a.sales_rep_name}",
           :address_1 => "#{a.address_1}", :address_2 => "#{a.address_2}", :city => "#{a.city}", text: a.name, id: a.id,
           :state => "#{a.state}", :zip => "#{a.zip}", :phone => "#{a.phone}", :email => "#{a.email}", :bill_to_email => "#{a.bill_to_email}"
         } 
@@ -108,7 +109,11 @@ class AccountsController < ApplicationController
   end
 
   def update_index
-    @accounts = Account.joins(:main_address).order(sort_column + " " + sort_direction).includes(:group)
+    if current_user.has_role?(:Sales)
+      @accounts= Account.where(sales_rep_id: current_user.id).joins(:main_address).order(sort_column + " " + sort_direction).includes(:group)
+    else
+      @accounts = Account.joins(:main_address).order(sort_column + " " + sort_direction).includes(:group)
+    end
     unless params[:term].blank?
       @accounts = @accounts.lookup(params[:term]) if params[:term].present?
     end

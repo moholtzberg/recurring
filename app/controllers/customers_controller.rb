@@ -1,7 +1,7 @@
 class CustomersController < ApplicationController
   layout "admin"
   respond_to :html, :json
-  # before_action :set_customer, only: [:show, :edit, :update, :destroy, :statements]
+  before_action :set_customer, only: [:show, :edit, :update, :destroy, :statements]
   # load_and_authorize_resource except: [:statements, :datatables, :autocomplete]
   
   def datatables

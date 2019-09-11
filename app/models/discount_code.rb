@@ -21,4 +21,8 @@ class DiscountCode < ActiveRecord::Base
       .where('lower(code) like ? or lower(discount_code_effects.name) like ?',
              "%#{word.downcase}%", "%#{word.downcase}%").references(:effect)
   end
+  
+  def create_effect
+    DiscountCodeEffect.create(discount_code_id: id)
+  end
 end

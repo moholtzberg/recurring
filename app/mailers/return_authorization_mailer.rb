@@ -26,7 +26,8 @@ class ReturnAuthorizationMailer < ApplicationMailer
       eventable_type: 'ReturnAuthorization',
       eventable_id: @return_authorization.id
     })
-    headers['X-Mailgun-Variables'] = @email_delivery.id
+    email.mailgun_variables = {record_id: @email_delivery.id}
+    # headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
   def cancel(return_authorization_id, options = {})
@@ -55,7 +56,8 @@ class ReturnAuthorizationMailer < ApplicationMailer
       eventable_type: 'ReturnAuthorization',
       eventable_id: @return_authorization.id
     })
-    headers['X-Mailgun-Variables'] = @email_delivery.id
+    email.mailgun_variables = {record_id: @email_delivery.id}
+    # headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
 end

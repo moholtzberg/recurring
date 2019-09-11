@@ -41,3 +41,5 @@ en:
   active: "Active"
   preferred: "Preferred"
   show_in_menu: "Show in Menu"
+  change_password: "Change Password"
+  admin_dashboard: "Admin Dashboard"

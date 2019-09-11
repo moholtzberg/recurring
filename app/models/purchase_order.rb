@@ -2,6 +2,8 @@ class PurchaseOrder < ActiveRecord::Base
   
   include ApplicationHelper
   
+  validates :number, uniqueness: true
+  
   belongs_to :vendor, :class_name => "Account"
   has_many :purchase_order_line_items, :inverse_of => :purchase_order, :dependent => :destroy
   has_many :purchase_order_receipts, :dependent => :destroy

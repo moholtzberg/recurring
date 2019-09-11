@@ -42,13 +42,13 @@
 		</tr>
 		<% total = 0 %>
 		<% orders = @orders %>
-		<% orders.by_date_range(@from, @to).order(:date).each do |o| %>
+		<% orders.by_date_range_submitted_at(@from, @to).order(:date).each do |o| %>
 			<% if o.fulfilled %>
 			<tr>
 				<% total += o.balance_due %>
 				<td><%= o.account.name %></td>
 				<td><%= o.account.user.email unless (o.account.nil? || o.account.user.nil?) %></td>
-				<td><%= o.due_date.in_time_zone.strftime("%m/%d/%Y") unless o.due_date.blank? %></td>
+				<td><%= o.submitted_at.in_time_zone.strftime("%m/%d/%Y") unless o.submitted_at.blank? %></td>
 				<td><%= o.number %></td>
 				<td><%= number_to_currency(o.total) %></td>
 				<td><%= number_to_currency(o.balance_due) %></td>

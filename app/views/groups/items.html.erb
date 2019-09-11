@@ -17,7 +17,7 @@
 		
 		<% order_ids = Order.where(account_id: @ids).ids %>
 		<% start = 0 %>
-	<% @items.each do |i|%>
+	<% @items.limit(200).each do |i|%>
 	<% group_item_price = i.item.prices.actual.by_group(@group.id).last %>
 	<% if i.qty > 0 %>
 	<% start = start + 1  %>
@@ -26,13 +26,41 @@
 		<td><%= start %></td>
 		<td><%= i.item_id %></td>
 		<td><%= number_with_delimiter(i.qty) %></td>
-		<td><%= i.number %></td>
-		<td><% prc = group_item_price.nil? ? 0 : group_item_price.price %>
-			<%= number_to_currency([prc, i.item.default_price.price.to_f.to_d].min) %></td>
-		<td><%= number_to_currency(i.item.actual_cost_price.to_s.to_d * 1.1416) %></td>
-		<td><%= number_to_percentage((([prc, i.item.default_price.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) / ([prc, i.item.default_price.price.to_f].min) * 100.ceil)  %></td>
-		<td><%= number_to_currency(([prc, i.item.default_price.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) %></td>
-		<td><%= number_to_currency((([prc, i.item.default_price.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) * i.qty) %></td>
+		<td><%= i.item.number %></td>
+		<td><%= i.item.name %></td>
+		<td><%# prc = group_item_price.nil? ? 0 : group_item_price.price %>
+			<%# number_to_currency([prc, i.item.default_price&.price&.to_f.to_d].min) %>
+			<%# es1 = i.item&.item_vendor_prices.where(vendor_id: 106)&.last&.price&.to_s %>
+			<%# es2 = i.item&.item_vendor_prices.where(vendor_id: 500)&.last&.price&.to_s %>
+			<%# sw = i.item&.item_vendor_prices.where(vendor_id: 347)&.last&.price&.to_s %>
+		</td>
+		<td><%# number_to_currency(i.item.actual_cost_price&.to_s&.to_d * 1.1539) %><%# es1 %></td>
+		<td><%# number_to_percentage((([prc, i.item.default_price&.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) / ([prc, i.item.default_price&.price.to_f].min) * 100.ceil)  %><%# es2 %></td>
+		<td><%# number_to_currency(([prc, i.item.default_price.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) %><%= i.item.default_price&.price&.to_f.to_d %></td>
+		<td><%# number_to_currency((([prc, i.item.default_price.price.to_f].min) - (i.item.actual_cost_price.to_s.to_d * 1.1416)) * i.qty) %>
+			<%# tes1 = (es1.to_s.to_d * 5) * 1.1539 %>
+			<%# tes2 = (es2.to_s.to_d * 5) %>
+			<%# (tes2 > 75.00) ? tes2 : (tes2 + 5.00)%>
+			<%# [tes1, tes2].min / 5%>
+			<%= (i.item.default_price&.price&.to_f.to_d) * 0.9 %>
+		</td>
+		<td>
+				<% if i.item.number.match(".+COMP$") %>
+					<% itm = i.item.prices.where(appliable_id: 2, appliable_type: "Group").last %>
+					<%= itm&.price.to_s%> / 
+					<% if itm&.price.to_s.to_d < 10 %>
+						<%= itm&.price.to_s.to_d - 0.5 %>
+					<% elsif itm&.price.to_s.to_d >= 10 && itm&.price.to_s.to_d < 30 %>
+						<%= itm&.price.to_s.to_d - 1.0 %>
+					<% elsif itm&.price.to_s.to_d >= 30 && itm&.price.to_s.to_d < 50 %>
+						<%= itm&.price.to_s.to_d - 2.0 %>
+					<% elsif itm&.price.to_s.to_d >= 50 && itm&.price.to_s.to_d < 75 %>
+						<%= itm&.price.to_s.to_d - 3.0 %>
+					<% elsif itm&.price.to_s.to_d >= 75 %>
+						<%= itm&.price.to_s.to_d - 4.0 %>
+					<% end %>
+				<% end%>
+		</td>
 	</tr>
 	<%# end %>
 	<% end %>

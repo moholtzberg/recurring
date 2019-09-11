@@ -2,13 +2,12 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-body">
-			<div class="address col-md-6">
-				<%= cc.logo_class %><br/>
-				<%= cc.card_type %><br/>
-				<%= "**** #{cc.last_4} Exp #{cc.expiration}" %><br/>
+			<div class="address col-md-8">
+				<%= cc.cardholder_name %><br/>
+				<i class="<%= cc.logo_class %>"></i> <%= cc.card_type %> <%= "**** #{cc.last_4} Exp #{cc.expiration}" %><br/>
 			</div>
-			<div class="col-md-6">
-				<%= link_to "Choose", checkout_fast_update_payment_method_path(:payment_method_id => cc.id), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
+			<div class="col-md-4">
+				<%= link_to "Choose", checkout_fast_update_payment_method_path(:credit_card_id => cc.id, :terms => "Credit Card"), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
 			</div>
 		</div>
 	</div>
@@ -23,14 +22,14 @@
 				Net <%= current_user.account.credit_terms %><br/>
 			</div>
 			<div class="col-md-6">
-				<%= link_to "Choose", checkout_fast_update_payment_method_path, remote: true, method: "patch", class: "btn btn-primary pull-right" %>
+				<%= link_to "Choose", checkout_fast_update_payment_method_path(:credit_card_id => "", :terms => "Net #{current_user.account.credit_terms}"), remote: true, method: "patch", class: "btn btn-primary pull-right" %>
 			</div>
 		</div>
 	</div>
 	
 <% else %>
 
-	<% if account.credit_hold? %>
+	<% if current_user.account.credit_hold? %>
 	<p>You're account is on credit hold, please call customer service to the creidt hold removed!</p>
 	<% end %>
 

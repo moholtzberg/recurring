@@ -54,6 +54,10 @@ class Account < ActiveRecord::Base
     has_credit and credit_limit.to_d >= (orders.map(&:balance_due).sum).to_d
   end
   
+  def available_credit
+    credit_limit.to_d - (orders.map(&:balance_due).sum).to_d
+  end
+  
   def payment_terms
     credit_terms.to_i
   end

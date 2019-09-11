@@ -1,0 +1,3 @@
+<% unless flash[:error] %>
+	$("div#checkout_shipping_method").html("<%= j render :partial => 'checkout/fast/choose_shipping_method', :format => 'html' %>")
+<% end %>

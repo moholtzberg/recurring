@@ -4,7 +4,7 @@
 	<table class="table table-bordered table-condensed" id="orders-table" data-source="<%= datatables_orders_path(format: :json, from: params[:action]) %>">
   	<thead>
       <tr class="filters">
-        <th colspan="10"><%= button_tag 'Filter Columns', type: "button", class: "btn btn-primary pull-right", data: { toggle: "modal", target: "#filterModal" } %></th>
+        <th colspan="11"><%= button_tag 'Filter Columns', type: "button", class: "btn btn-primary pull-right", data: { toggle: "modal", target: "#filterModal" } %></th>
       </tr>
 			<tr>
 				<th>Number</th>
@@ -14,6 +14,7 @@
 				<th>Shipped</th>
 				<th>Fulfilled</th>
 				<th>Balance Due</th>
+				<th>PO Number</th>
 				<th>Submitted At</th>
 				<th>State</th>
 				<th>&nbsp;</th>

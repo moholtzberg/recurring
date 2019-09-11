@@ -1,10 +1,11 @@
 ruby "2.3.3"
 
 source 'https://rubygems.org'
-gem 'rails', '~> 4.2.7.1'
+gem 'rails', '~> 4.2.11.1'
+# gem 'bundler', '~> 1.17.3'
 
 gem 'sqlite3', group: :development
-gem 'pg'
+gem 'pg', '~> 0.21'
 
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
@@ -28,19 +29,20 @@ gem 'sunspot_solr', :group => "development"
 gem 'unicorn'
 gem 'bootstrap-sass', '~> 3.3.5'
 gem 'font-awesome-sass'
-gem 'paperclip'
+gem 'paperclip', '>= 5.2.0'
 gem 'aws-sdk', '~> 3'
 gem 'devise'
 # gem 'devise_token_auth'
 gem 'simple_token_authentication', '~> 1.0'
 gem "recaptcha", require: "recaptcha/rails"
 gem 'roo'
-gem 'will_paginate-bootstrap', :github => "cd-rum/will_paginate-bootstrap"
+gem 'will_paginate-bootstrap'
 gem 'twitter-typeahead-rails', :git => "git://github.com/yourabi/twitter-typeahead-rails.git"
 gem 'best_in_place'
 gem 'rack-mini-profiler'
 gem 'dalli'
 gem 'shrimp'
+gem 'mailgun-ruby'
 gem 'mailgun_rails'
 gem 'cancancan', '~> 1.13', '>= 1.13.1'
 gem 'rolify', '~> 5.1'
@@ -50,7 +52,7 @@ gem 'qbo_api'
 gem 'oauth-plugin'
 gem 'newrelic_rpm'
 
-gem 'wicked_pdf'
+gem 'wicked_pdf', '1.1.0'
 gem 'wkhtmltopdf-binary'
 
 gem 'sidekiq', '4.2.7'
@@ -76,9 +78,9 @@ end
 gem 'raindrops', '~> 0.15.0'
 gem 'state_machines'
 gem 'state_machines-activerecord'
-gem 'themes_on_rails'
+# gem 'themes_on_rails'
 gem 'jquery-datatables-rails'
-gem 'ajax-datatables-rails'
+gem 'ajax-datatables-rails', '0.4.0'
 gem 'acts_as_list'
 gem 'remotipart', '~> 1.2'
 gem "select2-rails"
@@ -88,3 +90,5 @@ gem 'bootstrap-datepicker-rails'
 gem 'paper_trail'
 gem 'lograge'
 gem 'rack-attack'
+
+gem 'rb-readline'

@@ -17,6 +17,7 @@ class PurchaseOrderMailer < ApplicationMailer
       :subject => "Purchase Order Notification #{@purchase_order.number}", 
       :html => render_to_string("purchase_order_mailer/purchase_order_confirmation"),
       :text => render_to_string("purchase_order_mailer/purchase_order_confirmation").to_str
+      # "v:record-id" => @email_delivery.id
     )
     @email_delivery = EmailDelivery.create({
       addressable_type: 'Vendor',
@@ -26,7 +27,8 @@ class PurchaseOrderMailer < ApplicationMailer
       eventable_type: 'PurchaseOrder',
       eventable_id: @purchase_order.id
     })
-    headers['X-Mailgun-Variables'] = @email_delivery.id
+    email.mailgun_variables = {record_id: @email_delivery.id}
+    # headers['X-Mailgun-Variables'] = @email_delivery.id
   end
   
 end

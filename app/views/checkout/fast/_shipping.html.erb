@@ -1,0 +1,3 @@
+<%= "#{@shipping_method.name} - #{number_to_currency(@shipping_method.calculate(@checkout.sub_total))}" %><br/>
+<%= @shipping_method.description %>
+<%= link_to "Choose a Different Shipping Method", checkout_fast_choose_shipping_method_path, remote: true %>

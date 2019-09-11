@@ -1,18 +1,19 @@
 <% number_of_months = (@to_date.year * 12 + @to_date.month) - (@from_date.year * 12 - @from_date.month) %>
-<% total = 0%>
-<% (0..number_of_months).to_a.reverse.each do |month_offset| %>
+
+<% total = 0 %>
+<%# (@from_date.beginning_of_month..@to_date.end_of_month).to_a.reverse.each do |month_offset| %>
+
+	<%# s = month_offset.months.ago.beginning_of_month %>
+	<%# e = month_offset.months.ago.end_of_month %>
 	
-	<% s = month_offset.months.ago.beginning_of_month %>
-	<% e = month_offset.months.ago.end_of_month %>
-	
-	<% order_ids = Order.where("COALESCE(tax_total,0) <> 0").where(submitted_at: s..e).fulfilled %>
+	<% order_ids = Order.where("COALESCE(tax_total,0) <> 0").where(submitted_at: @from_date..@to_date).fulfilled %>
 	
 	<% order_tax_rates = OrderTaxRate.where(order_id: order_ids) %>
 	
 	<% if order_tax_rates.map(&:amount).sum > 0 %>
 		<table class="table table-bordered">
 			<tr>
-				<th colspan="2"><%= Date::MONTHNAMES[s.month] %> <%= s.year %></th>
+				<th colspan="2"><%# @from_date..@to_date.to_s %><%# Date::MONTHNAMES[s.month] %> <%# s.year %></th>
 			</tr>
 			<% sum = 0 %>
 			<% TaxRate.where(id: order_tax_rates.map(&:tax_rate_id)).each do |t| %>
@@ -42,9 +43,11 @@
 			<% end %>
 		</table>
 	<% end %>
-<% end %>
+<%# end %>
 	<table class="table table-bordered">
 		<th class="danger">
 			<td colspan="2"><%= number_to_currency(total)%></td>
 		</th>
 	</table>
+	
+	<%= order_ids = Order.where("COALESCE(tax_total,0) <> 0").where(submitted_at: @from_date..@to_date).fulfilled.inspect %>

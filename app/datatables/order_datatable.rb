@@ -1,17 +1,18 @@
 class OrderDatatable < AjaxDatatablesRails::Base
-
-  def_delegators :@view, :dropdown, :number_to_currency, :expand_button
+  
+  def_delegators :@view, :dropdown, :number_to_currency, :expand_button, :current_user
 
   def view_columns
     @view_columns ||= {
       number: { source: "Order.number" },
       account: { source: "Account.name" },
-      total: { source: "", searchable: false },
+      total: { source: "Order.total", searchable: false },
       sub_total: { source: "Order.sub_total", cond: :eq },
       shipped: { source: "", searchable: false },
       fulfilled: { source: "", searchable: false },
       balance_due: { source: "", searchable: false },
       submitted_at: { source: "Order.submitted_at" },
+      po_number: { source: "Order.po_number"},
       state: { source: "Order.state", cond: :eq },
       dropdown: { source: "", searchable: false }
     }
@@ -28,6 +29,7 @@ class OrderDatatable < AjaxDatatablesRails::Base
         fulfilled: number_to_currency(record.amount_fulfilled),
         balance_due: number_to_currency(record.balance_due),
         submitted_at: record.submitted_at&.strftime("%m/%d/%y %I:%M %p"),
+        po_number: record.po_number,
         state: record.state,
         dropdown: dropdown(record.class, record)
       }
@@ -38,6 +40,10 @@ class OrderDatatable < AjaxDatatablesRails::Base
 
   def get_raw_records
     orders = Order.eager_load({:account => [:group]}, {:order_line_items => [:line_item_shipments, :line_item_fulfillments]}, :order_tax_rate, :order_payment_applications => [:payment])
+    # if current_user.has_role?(:Sales)
+    #   orders = orders.where(sales_rep_id: options[:current_user_id])
+    # end
+    # puts orders.inspect
     orders.where(filter_query(options[:filters]))
   end
 

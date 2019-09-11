@@ -41,6 +41,7 @@
     <th>Locked</th>
     <th>PO Number</th>
     <th>Sales Rep</th>
+		<th>Terms</th>
   </tr>
   <tr>
     <td><%= order.number %></td>
@@ -49,6 +50,7 @@
     <td><% if !order.locked %> <%=link_to("Lock", lock_order_path(order.id), :remote => true, :method => "put")%> <% else %>Yes<% end %></td>
     <td><%= order.po_number %></td>
     <td><%= "#{order.sales_rep.first_name} #{order.sales_rep.last_name}" unless order.sales_rep.blank? %></td>
+		<td><%= order.terms %></td>
   </tr>
 </table>
 

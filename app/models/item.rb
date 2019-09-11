@@ -159,7 +159,7 @@ class Item < ActiveRecord::Base
   self.per_page = 10
 
   def actual_cost_price
-    [cheapest_vendor_price.price, (cost_price if cost_price != 0)].compact.min
+    [cheapest_vendor_price&.price, (cost_price if cost_price != 0)].compact.min
   end
 
   def cheapest_vendor_price
