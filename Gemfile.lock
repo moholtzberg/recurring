@@ -950,7 +950,7 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     raabro (1.1.6)
-    rack (1.6.11)
+    rack (1.6.12)
     rack-attack (5.4.2)
       rack (>= 1.0, < 3)
     rack-mini-profiler (1.0.2)
